@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OTP Verification - RESQ Kerala</title>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<style>
+body { font-family: 'Lexend', sans-serif; }
+
+.otp-input {
+  width: 2.5rem;
+  height: 2.8rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 2px solid #cbd5e1;
+  background: transparent;
+}
+.otp-input:focus {
+  outline: none;
+  border-bottom: 3px solid #f27f0d;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.shake { animation: shake 0.35s; }
+</style>
+</head>
+
+<body class="bg-[#221910] min-h-screen flex items-center justify-center px-4">
+
+<div id="otpCard" class="max-w-md w-full bg-white/5 p-8 rounded-xl shadow-xl text-white">
+
+<h1 class="text-2xl font-bold text-center mb-2">Verify OTP</h1>
+<p class="text-center text-slate-300 mb-6">
+Enter the 6-digit OTP sent to your mobile
+</p>
+
+<!-- OTP INPUTS -->
+<div class="flex justify-between mb-4">
+  <input class="otp-input" maxlength="1" inputmode="numeric">
+  <input class="otp-input" maxlength="1" inputmode="numeric">
+  <input class="otp-input" maxlength="1" inputmode="numeric">
+  <input class="otp-input" maxlength="1" inputmode="numeric">
+  <input class="otp-input" maxlength="1" inputmode="numeric">
+  <input class="otp-input" maxlength="1" inputmode="numeric">
+</div>
+
+<!-- TIMER -->
+<p id="timerText" class="text-center text-sm text-slate-400 mb-4">
+Resend OTP in <span id="time">30</span>s
+</p>
+
+<!-- RESEND -->
+<button
+  id="resendBtn"
+  onclick="resendOTP()"
+  disabled
+  class="w-full mb-4 py-3 rounded-xl border border-orange-400 text-orange-400 font-semibold opacity-50">
+Resend OTP
+</button>
+
+<button
+  onclick="verifyOTP()"
+  class="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg rounded-xl">
+Verify & Continue
+</button>
+
+<div id="recaptcha-container"></div>
+
+</div>
+
+<script>
+/* 🔥 FIREBASE CONFIG — SAME AS LOGIN PAGE */
+const firebaseConfig = {
+  apiKey: "AIzaSyCzmzmCKR9jV7CX0X9zhxd12WbhI4ykfPQ",
+  authDomain: "frontend-bb52b.firebaseapp.com",
+  projectId: "frontend-bb52b",
+  storageBucket: "frontend-bb52b.firebasestorage.app",
+  messagingSenderId: "214394369614",
+  appId: "1:214394369614:web:0a4d4021e1999f27a6b51f"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+/* 🔐 INIT INVISIBLE RECAPTCHA */
+let recaptchaVerifier;
+window.onload = () => {
+  recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+    "recaptcha-container",
+    { size: "invisible" }
+  );
+};
+
+/* OTP INPUT AUTO MOVE */
+const otpInputs = document.querySelectorAll(".otp-input");
+const otpCard = document.getElementById("otpCard");
+
+otpInputs.forEach((input, i) => {
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "");
+    if (input.value && i < otpInputs.length - 1) otpInputs[i + 1].focus();
+    if (i === otpInputs.length - 1) autoSubmit();
+  });
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Backspace" && !input.value && i > 0)
+      otpInputs[i - 1].focus();
+  });
+});
+
+function autoSubmit() {
+  let otp = "";
+  otpInputs.forEach(i => otp += i.value);
+  if (otp.length === 6) verifyOTP();
+}
+
+/* VERIFY OTP */
+function verifyOTP() {
+  let otp = "";
+  otpInputs.forEach(i => otp += i.value);
+
+  if (otp.length !== 6) return;
+
+  const verificationId = localStorage.getItem("verificationId");
+  const role = localStorage.getItem("role");
+
+  if (!verificationId) {
+    alert("Session expired. Please login again.");
+    location.href = "index.html";
+    return;
+  }
+
+  const credential = firebase.auth.PhoneAuthProvider.credential(verificationId, otp);
+
+  firebase.auth().signInWithCredential(credential)
+    .then(() => {
+      alert("Login Successful 🎉");
+      if (role === "mechanic") location.href = "mechanic_dash.html";
+      else location.href = "user_dash.html";
+    })
+    .catch(() => {
+      otpCard.classList.add("shake");
+      setTimeout(() => otpCard.classList.remove("shake"), 400);
+      otpInputs.forEach(i => i.value = "");
+      otpInputs[0].focus();
+      alert("Invalid OTP ❌");
+    });
+}
+
+/* RESEND OTP TIMER */
+let timer = 30;
+const resendBtn = document.getElementById("resendBtn");
+const timerText = document.getElementById("timerText");
+
+function startTimer() {
+  resendBtn.disabled = true;
+  resendBtn.classList.add("opacity-50");
+  timer = 30;
+  document.getElementById("time").innerText = timer;
+
+  const interval = setInterval(() => {
+    timer--;
+    document.getElementById("time").innerText = timer;
+
+    if (timer <= 0) {
+      clearInterval(interval);
+      resendBtn.disabled = false;
+      resendBtn.classList.remove("opacity-50");
+      timerText.innerText = "Didn't receive OTP?";
+    }
+  }, 1000);
+}
+
+/* RESEND OTP */
+function resendOTP() {
+  const phone = localStorage.getItem("phone");
+
+  firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
+    .then(result => {
+      localStorage.setItem("verificationId", result.verificationId);
+      startTimer();
+      otpInputs.forEach(i => i.value = "");
+      otpInputs[0].focus();
+      alert("OTP resent successfully ✅");
+    })
+    .catch(err => alert(err.message));
+}
+
+startTimer();
+</script>
+
+</body>
+</html>

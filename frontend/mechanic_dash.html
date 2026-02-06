@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanic Tracking - RESQ</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#f27f0d",
+        bgDark: "#1a1612"
+      },
+      fontFamily: { display: ["Lexend"] }
+    }
+  }
+}
+</script>
+</head>
+
+<body class="bg-slate-100 dark:bg-bgDark font-display min-h-screen flex flex-col">
+
+<!-- HEADER -->
+<header class="px-6 py-4 bg-white dark:bg-bgDark border-b">
+  <h1 class="text-xl font-bold text-primary">RESQ – Mechanic Tracking</h1>
+</header>
+
+<!-- MAIN -->
+<main class="flex-1 p-6 max-w-2xl mx-auto">
+
+<!-- STATUS CARD -->
+<div class="bg-white dark:bg-white/5 p-6 rounded-xl shadow mb-6">
+  <h2 class="text-lg font-bold mb-2">Service Status</h2>
+  <p id="statusText" class="text-primary font-bold text-xl">
+    On The Way
+  </p>
+</div>
+
+<!-- CUSTOMER INFO -->
+<div class="bg-white dark:bg-white/5 p-6 rounded-xl shadow mb-6">
+  <h3 class="font-bold mb-2">Customer Details</h3>
+  <p><b>Name:</b> Rahul K</p>
+  <p><b>Issue:</b> <span id="issueType">Flat Tyre</span></p>
+  <p><b>Location:</b> Thrissur</p>
+
+  <div class="flex gap-4 mt-4">
+    <a href="tel:+919876543210"
+       class="flex-1 text-center py-3 rounded-xl bg-green-600 text-white font-bold">
+       Call Customer
+    </a>
+
+    <a href="https://www.google.com/maps"
+       target="_blank"
+       class="flex-1 text-center py-3 rounded-xl bg-blue-600 text-white font-bold">
+       Navigate
+    </a>
+  </div>
+</div>
+
+<!-- STATUS ACTIONS -->
+<div class="bg-white dark:bg-white/5 p-6 rounded-xl shadow">
+  <h3 class="font-bold mb-4">Update Status</h3>
+
+  <div class="grid grid-cols-1 gap-4">
+    <button onclick="updateStatus('Arrived')"
+      class="py-3 rounded-xl bg-primary text-white font-bold">
+      Arrived at Location
+    </button>
+
+    <button onclick="updateStatus('Work Started')"
+      class="py-3 rounded-xl bg-yellow-500 text-white font-bold">
+      Start Work
+    </button>
+
+    <button onclick="updateStatus('Completed')"
+      class="py-3 rounded-xl bg-green-600 text-white font-bold">
+      Complete Service
+    </button>
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="text-center text-xs text-slate-400 py-4">
+© 2024 RESQ Kerala
+</footer>
+
+<script>
+/* LOAD SAVED DATA */
+const issue = localStorage.getItem("issueType") || "Unknown Issue";
+document.getElementById("issueType").innerText = issue;
+
+const savedStatus = localStorage.getItem("serviceStatus");
+if(savedStatus){
+  document.getElementById("statusText").innerText = savedStatus;
+}
+
+/* UPDATE STATUS */
+function updateStatus(status){
+  localStorage.setItem("serviceStatus", status);
+  document.getElementById("statusText").innerText = status;
+
+  if(status === "Completed"){
+    setTimeout(() => {
+      window.location.href = "payment.html";
+    }, 800);
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Service History - RESQ Kerala</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script>
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                primary: "#f27f0d",
+                "background-light": "#f8f7f5",
+                "background-dark": "#221910",
+            },
+            fontFamily: { display: ["Lexend"] }
+        },
+    },
+}
+</script>
+
+<style>
+body { font-family: 'Lexend', sans-serif; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+
+<!-- 🔒 LOGIN CHECK -->
+<script>
+if(localStorage.getItem("role") !== "user"){
+    window.location.href = "front.html";
+}
+</script>
+
+<div class="flex h-screen overflow-hidden">
+
+<!-- SIDEBAR -->
+<aside class="w-72 bg-white dark:bg-[#181411] border-r border-slate-200 dark:border-slate-800 flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">car_repair</span>
+</div>
+<div>
+<h1 class="text-lg font-bold">RESQ Kerala</h1>
+<p class="text-xs text-slate-500">Emergency Support</p>
+</div>
+</div>
+
+<nav class="flex-1 px-4 py-2 space-y-1">
+<a href="user_dash.html" class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+</a>
+
+<a href="service_history.html" class="flex items-center gap-3 px-4 py-3 bg-primary text-white rounded shadow-lg">
+<span class="material-symbols-outlined">history</span> Request History
+</a>
+
+<a href="add_newvehicle.html" class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+<span class="material-symbols-outlined">directions_car</span> My Vehicles
+</a>
+
+<a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+<span class="material-symbols-outlined">payments</span> Payments
+</a>
+
+<div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+<a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+<span class="material-symbols-outlined">settings</span> Settings
+</a>
+</div>
+</nav>
+
+<!-- USER PROFILE -->
+<div class="p-4 mt-auto">
+<div class="bg-slate-50 dark:bg-[#27211b] p-4 rounded-xl flex items-center gap-3 border">
+<div class="size-10 rounded-full bg-primary text-white flex items-center justify-center">U</div>
+<div>
+<p id="userName" class="text-sm font-semibold">User</p>
+<p class="text-xs text-slate-500">RESQ Member</p>
+</div>
+</div>
+</div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="flex-1 overflow-y-auto p-8">
+<div class="max-w-6xl mx-auto">
+
+<header class="mb-8 flex justify-between items-end">
+<div>
+<h2 class="text-4xl font-black">Service History</h2>
+<p class="text-slate-500">Your past breakdown assistance requests in Kerala.</p>
+</div>
+</header>
+
+<!-- TABLE -->
+<div class="bg-white dark:bg-[#181411] rounded-xl border overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-[#27211b]">
+<tr>
+<th class="px-6 py-4">Date</th>
+<th class="px-6 py-4">District</th>
+<th class="px-6 py-4">Mechanic</th>
+<th class="px-6 py-4">Cost</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4 text-right">Action</th>
+</tr>
+</thead>
+
+<tbody class="divide-y">
+
+<tr>
+<td class="px-6 py-4">Oct 24, 2023</td>
+<td class="px-6 py-4">Kozhikode</td>
+<td class="px-6 py-4">Rahul Das</td>
+<td class="px-6 py-4">₹1,200</td>
+<td class="px-6 py-4 text-emerald-500 font-semibold">Completed</td>
+<td class="px-6 py-4 text-right">
+<button onclick="viewDetails('Kozhikode','Rahul Das')" class="text-primary font-bold">View Details</button>
+</td>
+</tr>
+
+<tr>
+<td class="px-6 py-4">Sep 12, 2023</td>
+<td class="px-6 py-4">Ernakulam</td>
+<td class="px-6 py-4">Suresh K.</td>
+<td class="px-6 py-4">₹850</td>
+<td class="px-6 py-4 text-emerald-500 font-semibold">Completed</td>
+<td class="px-6 py-4 text-right">
+<button onclick="viewDetails('Ernakulam','Suresh K.')" class="text-primary font-bold">View Details</button>
+</td>
+</tr>
+
+<tr>
+<td class="px-6 py-4">Aug 05, 2023</td>
+<td class="px-6 py-4">Trivandrum</td>
+<td class="px-6 py-4">Nitin V.</td>
+<td class="px-6 py-4">₹0</td>
+<td class="px-6 py-4 text-gray-400 font-semibold">Cancelled</td>
+<td class="px-6 py-4 text-right">
+<button onclick="viewDetails('Trivandrum','Nitin V.')" class="text-primary font-bold">View Details</button>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+</main>
+</div>
+
+<!-- SCRIPTS -->
+<script>
+// Show logged-in username
+document.getElementById("userName").innerText = localStorage.getItem("username") || "User";
+
+// Send details to tracking page
+function viewDetails(district, mechanic){
+    localStorage.setItem("userDistrict", district);
+    localStorage.setItem("assignedMechanic", mechanic);
+    localStorage.setItem("issueType", "Past Service");
+    window.location.href = "tracking.html";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin District Monitoring - AssistsKerala</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f27f0d",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221910",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>body {
+    font-family: "Lexend", sans-serif
+    }
+.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+select {
+    appearance: none;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBFK4ojqkbyyMvYd2ntQhoP4hldTOoxBe1HYteSQ2utOBkmLaBYFHRGJJDuGtZH2eXi98Xt0tEOPaLuseqn9lCHBAIASz3Hh7o32wz2tjaQx4zGRyyLbE57twmKC3UkRPt9lNIhViyxawyL3cR6bDPFbGQpl2VFLLevOJheeFHX9MbDroHB8RkXCM9NGNGNmSiS87_MDVADbrvZnDw6znXBRZDajLqQ17fOlIeoApFM3xsYehiSRN_Renmt-R3TdmuxRzSinOrEindc);
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em
+    }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-[#2d2419] px-6 lg:px-40 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl">emergency_share</span>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">AssistsKerala Admin</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-primary text-sm font-semibold leading-normal border-b-2 border-primary pb-1" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Districts</a>
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Mechanics</a>
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<div class="hidden lg:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-background-dark/50">
+<div class="text-slate-400 flex items-center justify-center pl-3">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="w-full bg-transparent border-none focus:ring-0 text-sm placeholder:text-slate-400 px-3" placeholder="Search logs, IDs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="bg-primary/20 p-0.5 rounded-full border border-primary/30">
+<img class="rounded-full size-8 object-cover" data-alt="Admin user profile headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxDGAQAG3RuwJCsIMqoC-0T_lvA9we78u-dD9TTe601uNQxartsGoZT10C_A2neTIy7yaqpjkwvmTKWERKc2qW0-tqVRKBV8ADIsZOb4KL_O8Hz68oA3NGl2UwkBEbJH2cw3_CNo9lISBlZSDgaIPUqejEjkG9puByVGdtCXh16IbyppxVufzCaHLYjkpo6KnkRgvbN04C4aXJsL5CYrAcHVXa9pwsudcQAHiVmrebEYGv45jnSH3x0IFIAm74jNSDNuscq9KJonsa"/>
+</div>
+</div>
+</div>
+</header>
+<main class="px-6 lg:px-40 py-8">
+<div class="max-w-[1200px] mx-auto">
+<!-- Dashboard Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+<div class="flex flex-col gap-2">
+<h1 class="text-slate-900 dark:text-white text-3xl md:text-4xl font-extrabold tracking-tight">District Monitoring</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base">Real-time roadside assistance overview across Kerala's 14 districts</p>
+</div>
+<!-- District Selector -->
+<div class="w-full md:w-72">
+<label class="block text-slate-700 dark:text-slate-300 text-sm font-semibold mb-2 ml-1">Filter by District</label>
+<select class="w-full h-12 rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-[#2d2419] text-slate-900 dark:text-white focus:border-primary focus:ring-primary transition-all px-4">
+<option value="all">All Districts (Kerala)</option>
+<option value="tvm">Thiruvananthapuram</option>
+<option value="klm">Kollam</option>
+<option value="pta">Pathanamthitta</option>
+<option value="alp">Alappuzha</option>
+<option value="ktm">Kottayam</option>
+<option value="idk">Idukki</option>
+<option value="ekm">Ernakulam</option>
+<option value="tsr">Thrissur</option>
+<option value="pkd">Palakkad</option>
+<option value="mlp">Malappuram</option>
+<option value="koz">Kozhikode</option>
+<option value="way">Wayanad</option>
+<option value="knr">Kannur</option>
+<option value="ksr">Kasaragod</option>
+</select>
+</div>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-white dark:bg-[#2d2419] rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col gap-3 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-6xl text-primary">sensors</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">sensors</span>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider">Active Requests</p>
+</div>
+<div class="flex items-baseline gap-3">
+<p class="text-slate-900 dark:text-white text-4xl font-bold">142</p>
+<span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> 12%
+                            </span>
+</div>
+<p class="text-slate-400 text-xs">Live requests currently in progress</p>
+</div>
+<div class="bg-white dark:bg-[#2d2419] rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col gap-3 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-6xl text-primary">verified_user</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">verified_user</span>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider">Pending Approvals</p>
+</div>
+<div class="flex items-baseline gap-3">
+<p class="text-slate-900 dark:text-white text-4xl font-bold">28</p>
+<span class="bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">schedule</span> Urgent
+                            </span>
+</div>
+<p class="text-slate-400 text-xs">New mechanic applications awaiting review</p>
+</div>
+<div class="bg-white dark:bg-[#2d2419] rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col gap-3 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-6xl text-primary">task_alt</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">task_alt</span>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider">Completed Services</p>
+</div>
+<div class="flex items-baseline gap-3">
+<p class="text-slate-900 dark:text-white text-4xl font-bold">14,205</p>
+<span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> 8%
+                            </span>
+</div>
+<p class="text-slate-400 text-xs">Total jobs successfully completed this month</p>
+</div>
+</div>
+<!-- Activity Log Table -->
+<div class="bg-white dark:bg-[#2d2419] rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold">Recent Activity Logs</h2>
+<button class="text-primary text-sm font-semibold hover:underline flex items-center gap-1">
+                            Export CSV <span class="material-symbols-outlined text-sm">download</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-background-dark/30">
+<tr>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Request ID</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">District</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Customer</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Issue</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Time</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4 font-mono text-sm text-slate-600 dark:text-slate-300">#REQ-8291</td>
+<td class="px-6 py-4 text-sm font-medium">Ernakulam</td>
+<td class="px-6 py-4 text-sm">Rahul Nair</td>
+<td class="px-6 py-4 text-sm">Tire Puncture</td>
+<td class="px-6 py-4 text-sm">
+<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-full text-xs font-bold">Assigned</span>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400 italic">2 mins ago</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4 font-mono text-sm text-slate-600 dark:text-slate-300">#REQ-8289</td>
+<td class="px-6 py-4 text-sm font-medium">Thrissur</td>
+<td class="px-6 py-4 text-sm">Anjali S.</td>
+<td class="px-6 py-4 text-sm">Battery Jumpstart</td>
+<td class="px-6 py-4 text-sm">
+<span class="bg-primary/10 text-primary px-2.5 py-1 rounded-full text-xs font-bold">Pending</span>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400 italic">5 mins ago</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4 font-mono text-sm text-slate-600 dark:text-slate-300">#REQ-8285</td>
+<td class="px-6 py-4 text-sm font-medium">Kottayam</td>
+<td class="px-6 py-4 text-sm">Vinu Kumar</td>
+<td class="px-6 py-4 text-sm">Engine Overheat</td>
+<td class="px-6 py-4 text-sm">
+<span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2.5 py-1 rounded-full text-xs font-bold">Completed</span>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400 italic">14 mins ago</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4 font-mono text-sm text-slate-600 dark:text-slate-300">#REQ-8282</td>
+<td class="px-6 py-4 text-sm font-medium">Palakkad</td>
+<td class="px-6 py-4 text-sm">Meera J.</td>
+<td class="px-6 py-4 text-sm">Fuel Delivery</td>
+<td class="px-6 py-4 text-sm">
+<span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2.5 py-1 rounded-full text-xs font-bold">Completed</span>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400 italic">21 mins ago</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4 font-mono text-sm text-slate-600 dark:text-slate-300">#REQ-8280</td>
+<td class="px-6 py-4 text-sm font-medium">Kozhikode</td>
+<td class="px-6 py-4 text-sm">Stephan P.</td>
+<td class="px-6 py-4 text-sm">Towing Service</td>
+<td class="px-6 py-4 text-sm">
+<span class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-2.5 py-1 rounded-full text-xs font-bold">In Progress</span>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400 italic">28 mins ago</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-center bg-slate-50 dark:bg-background-dark/20">
+<button class="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors">View All Logs</button>
+</div>
+</div>
+<!-- Map Section Preview -->
+<div class="mt-10 bg-white dark:bg-[#2d2419] rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">map</span> Heatmap View
+                        </h2>
+<div class="flex gap-2">
+<span class="flex items-center gap-1 text-xs text-slate-500"><span class="size-2 rounded-full bg-red-500"></span> High Volume</span>
+<span class="flex items-center gap-1 text-xs text-slate-500"><span class="size-2 rounded-full bg-primary"></span> Moderate</span>
+<span class="flex items-center gap-1 text-xs text-slate-500"><span class="size-2 rounded-full bg-blue-400"></span> Low</span>
+</div>
+</div>
+<div class="h-64 md:h-96 w-full rounded-xl bg-slate-200 dark:bg-slate-800 overflow-hidden relative" data-location="Kerala, India" style="">
+<div class="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-[#251b11] overflow-hidden">
+<!-- Abstract Map Pattern -->
+<div class="opacity-20 absolute inset-0 bg-[radial-gradient(#f27f0d_1.5px,transparent_1.5px)] [background-size:24px_24px]"></div>
+<div class="z-10 text-center flex flex-col items-center">
+<span class="material-symbols-outlined text-4xl text-primary mb-2">location_on</span>
+<p class="text-slate-500 dark:text-slate-400 font-medium">Live Geographic Visualizer</p>
+<p class="text-slate-400 text-xs">Currently tracking 14 active mechanics across Kerala</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto px-6 lg:px-40 py-8 border-t border-slate-200 dark:border-slate-800 text-center text-slate-400 text-sm">
+<p>© 2024 AssistsKerala Roadside Assistance. Internal Admin Use Only.</p>
+</footer>
+</div>
+</body></html>
