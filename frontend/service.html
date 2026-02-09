@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Select Service - RESQ Kerala</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script>
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                primary: "#f27f0d",
+                "background-light": "#f8f7f5",
+                "background-dark": "#221910",
+            },
+            fontFamily: { display: ["Lexend"] }
+        },
+    },
+}
+</script>
+
+<style>
+body { font-family: 'Lexend', sans-serif; }
+.service-selected { box-shadow: 0 0 0 3px #f27f0d inset; }
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+
+<!-- 🔒 LOGIN CHECK -->
+<script>
+if(localStorage.getItem("role") !== "user"){
+    window.location.href = "front.html";
+}
+</script>
+
+<div class="max-w-5xl mx-auto px-6 py-10">
+
+<h1 class="text-4xl font-black mb-6">Select Service Type</h1>
+
+<!-- 🛠 SERVICE GRID -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="serviceGrid">
+
+<button onclick="selectService(event,'Flat Tyre')" class="service-btn p-4 bg-white dark:bg-[#393028] rounded-xl">🛞 Flat Tyre</button>
+<button onclick="selectService(event,'Fuel')" class="service-btn p-4 bg-white dark:bg-[#393028] rounded-xl">⛽ Out of Fuel</button>
+<button onclick="selectService(event,'Battery')" class="service-btn p-4 bg-white dark:bg-[#393028] rounded-xl">🔋 Dead Battery</button>
+<button onclick="selectService(event,'Breakdown')" class="service-btn p-4 bg-white dark:bg-[#393028] rounded-xl">🚗 Breakdown</button>
+
+</div>
+
+<!-- 📍 KERALA DISTRICT -->
+<div class="mt-8">
+<label class="block font-semibold mb-2">Select Your District (Kerala Only)</label>
+<select id="districtSelect" class="w-full p-3 rounded-lg bg-white dark:bg-[#393028]">
+<option>Thiruvananthapuram</option>
+<option>Kollam</option>
+<option>Pathanamthitta</option>
+<option>Alappuzha</option>
+<option>Kottayam</option>
+<option>Idukki</option>
+<option>Ernakulam</option>
+<option>Thrissur</option>
+<option>Palakkad</option>
+<option>Malappuram</option>
+<option>Kozhikode</option>
+<option>Wayanad</option>
+<option>Kannur</option>
+<option>Kasaragod</option>
+</select>
+</div>
+
+<!-- 💰 SUMMARY -->
+<div class="mt-8 bg-primary/10 p-6 rounded-xl">
+<p class="font-semibold mb-2">Estimated Arrival: 15–20 mins</p>
+<p class="text-primary font-bold mb-4">Base Fare: ₹499</p>
+
+<button onclick="confirmRequest()" class="w-full py-4 bg-primary text-white text-lg font-bold rounded-full hover:scale-105 transition">
+Confirm Request
+</button>
+</div>
+
+</div>
+
+<script>
+let selectedService = localStorage.getItem("issueType") || "";
+
+// Highlight selected service
+function selectService(e, service){
+    selectedService = service;
+
+    document.querySelectorAll(".service-btn").forEach(btn => btn.classList.remove("service-selected"));
+    e.currentTarget.classList.add("service-selected");
+
+    localStorage.setItem("issueType", service);
+}
+
+// Auto-highlight from dashboard
+window.onload = () => {
+    if(selectedService){
+        document.querySelectorAll(".service-btn").forEach(btn => {
+            if(btn.innerText.toLowerCase().includes(selectedService.toLowerCase().split(" ")[0])){
+                btn.classList.add("service-selected");
+            }
+        });
+    }
+
+    // Restore previously selected district
+    const savedDistrict = localStorage.getItem("userDistrict");
+    if(savedDistrict){
+        document.getElementById("districtSelect").value = savedDistrict;
+    }
+}
+
+// Confirm request and move to tracking
+function confirmRequest(){
+    if(!selectedService){
+        alert("Please select a service type");
+        return;
+    }
+
+    const district = document.getElementById("districtSelect").value;
+
+    localStorage.setItem("issueType", selectedService);
+    localStorage.setItem("userDistrict", district);
+    localStorage.setItem("serviceStatus","Mechanic Assigned");
+
+    window.location.href = "mechanic_tracking.html";
+}
+</script>
+
+</body>
+</html>

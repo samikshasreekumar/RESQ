@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add New Vehicle - Roadside Kerala</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f27f0d",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221910",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-[#393028] px-6 lg:px-40 py-4 bg-background-light dark:bg-background-dark sticky top-0 z-50">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Roadside Kerala</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-bold" href="#">My Vehicles</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Services</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Help</a>
+</nav>
+<div class="flex gap-3">
+<button class="flex size-10 items-center justify-center rounded-full bg-slate-200 dark:bg-[#393028] text-slate-700 dark:text-white hover:bg-slate-300 dark:hover:bg-[#4a3f35] transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-full bg-slate-200 dark:bg-[#393028] text-slate-700 dark:text-white hover:bg-slate-300 dark:hover:bg-[#4a3f35] transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col items-center px-4 py-12">
+<div class="w-full max-w-[640px] flex flex-col gap-8">
+<!-- Header Title -->
+<div class="flex flex-col gap-2">
+<h1 class="text-slate-900 dark:text-white text-4xl font-extrabold leading-tight tracking-tight">Add New Vehicle</h1>
+<p class="text-slate-500 dark:text-[#baab9c] text-lg font-normal">Add your vehicle details for immediate assistance across Kerala.</p>
+</div>
+<!-- Form Section -->
+<div class="bg-white dark:bg-[#27211b]/50 p-8 rounded-xl border border-slate-200 dark:border-[#54473b] shadow-sm">
+<form class="flex flex-col gap-6">
+<!-- Vehicle Make/Model -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-700 dark:text-white text-base font-semibold">Vehicle Make &amp; Model</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">directions_car</span>
+<input class="form-input flex w-full rounded-xl border-slate-200 dark:border-[#54473b] bg-slate-50 dark:bg-[#27211b] text-slate-900 dark:text-white focus:ring-primary focus:border-primary h-14 pl-12 pr-4 text-base font-normal placeholder:text-slate-400 dark:placeholder:text-[#baab9c]" placeholder="e.g. Maruti Suzuki Swift / Honda Activa" type="text"/>
+</div>
+</div>
+<!-- License Plate Number -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-700 dark:text-white text-base font-semibold">License Plate Number</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">tag</span>
+<input class="form-input flex w-full rounded-xl border-slate-200 dark:border-[#54473b] bg-slate-50 dark:bg-[#27211b] text-slate-900 dark:text-white focus:ring-primary focus:border-primary h-14 pl-12 pr-4 text-base font-normal placeholder:text-slate-400 dark:placeholder:text-[#baab9c]" placeholder="e.g. KL 01 AB 1234" type="text"/>
+</div>
+</div>
+<!-- Vehicle Type Selector -->
+<div class="flex flex-col gap-3">
+<label class="text-slate-700 dark:text-white text-base font-semibold">Vehicle Type</label>
+<div class="grid grid-cols-3 gap-4">
+<label class="cursor-pointer group">
+<input checked="" class="peer hidden" name="vehicle_type" type="radio"/>
+<div class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-slate-200 dark:border-[#54473b] bg-slate-50 dark:bg-[#27211b] peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+<span class="material-symbols-outlined text-3xl group-peer-checked:text-primary">directions_car</span>
+<span class="text-sm font-bold">Car</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer hidden" name="vehicle_type" type="radio"/>
+<div class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-slate-200 dark:border-[#54473b] bg-slate-50 dark:bg-[#27211b] peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+<span class="material-symbols-outlined text-3xl group-peer-checked:text-primary">moped</span>
+<span class="text-sm font-bold">Bike</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer hidden" name="vehicle_type" type="radio"/>
+<div class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-slate-200 dark:border-[#54473b] bg-slate-50 dark:bg-[#27211b] peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+<span class="material-symbols-outlined text-3xl group-peer-checked:text-primary">local_shipping</span>
+<span class="text-sm font-bold">Heavy</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Action Button -->
+<div class="pt-4">
+<button class="w-full flex h-14 items-center justify-center gap-2 rounded-xl bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all" type="submit">
+<span class="material-symbols-outlined">save</span>
+                                Save Vehicle
+                            </button>
+</div>
+</form>
+</div>
+<!-- Assistance Info Banner -->
+<div class="flex items-start gap-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400">info</span>
+<p class="text-sm text-blue-800 dark:text-blue-200">
+                        Adding your vehicle helps our rescue teams identify you quickly and ensures we bring the right equipment for your specific model.
+                    </p>
+</div>
+</div>
+</main>
+<!-- Illustration Background Element (Abstract) -->
+<div class="fixed bottom-0 right-0 p-8 opacity-10 pointer-events-none hidden xl:block">
+<svg fill="none" height="400" viewbox="0 0 100 100" width="400" xmlns="http://www.w3.org/2000/svg">
+<circle class="text-primary" cx="50" cy="50" r="40" stroke="currentColor" stroke-width="2"></circle>
+<path class="text-primary" d="M20 50L80 50M50 20L50 80" stroke="currentColor" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Footer for quick access -->
+<footer class="w-full bg-slate-100 dark:bg-[#1a140e] py-8 border-t border-slate-200 dark:border-[#393028] mt-auto">
+<div class="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-slate-500 dark:text-[#baab9c] text-sm">© 2024 Roadside Kerala. Emergency 24/7 Helpline: 1800-ROAD-KERALA</p>
+<div class="flex gap-6 text-slate-500 dark:text-[#baab9c] text-sm">
+<a class="hover:text-primary" href="#">Privacy Policy</a>
+<a class="hover:text-primary" href="#">Terms of Service</a>
+<a class="hover:text-primary" href="#">Support</a>
+</div>
+</div>
+</footer>
+</body></html>

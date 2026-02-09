@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RESQ Live Tracking</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script>
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                primary: "#f27f0d",
+                "background-light": "#f8f7f5",
+                "background-dark": "#221910",
+            },
+            fontFamily: { display: ["Lexend"] }
+        },
+    },
+}
+</script>
+
+<style>
+body { font-family: 'Lexend', sans-serif; }
+.marker { position: absolute; transition: all 2.5s linear; }
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-white overflow-hidden">
+
+<script>
+if(localStorage.getItem("role") !== "user"){
+    window.location.href = "front.html";
+}
+
+const issueType = localStorage.getItem("issueType") || "Breakdown";
+const userDistrict = localStorage.getItem("userDistrict") || "Ernakulam";
+document.title = "RESQ Tracking - " + issueType;
+</script>
+
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+
+<header class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-4 bg-background-dark/80 backdrop-blur-md border-b border-white/10">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-4xl">home_repair_service</span>
+<div>
+<h2 class="text-lg font-bold">RESQ Kerala Assistance</h2>
+<p class="text-xs text-primary uppercase tracking-wider">Live Mechanic Tracking</p>
+</div>
+</div>
+<button onclick="goHome()" class="text-sm text-gray-300 hover:text-primary">Dashboard</button>
+</header>
+
+<main class="relative flex-1 w-full h-full pt-20">
+
+<div class="absolute inset-0 bg-gradient-to-br from-[#2a1f15] via-[#1c140d] to-black"></div>
+
+<!-- 🚗 USER MARKER -->
+<div id="userMarker" class="marker flex flex-col items-center">
+<div class="bg-blue-600 p-3 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-white text-3xl">directions_car</span>
+</div>
+<p class="mt-2 text-xs bg-black/70 px-2 py-1 rounded-full">Your Location</p>
+</div>
+
+<!-- 🔧 MECHANIC MARKER -->
+<div id="mechMarker" class="marker flex flex-col items-center">
+<div class="bg-primary p-3 rounded-full animate-bounce shadow-lg">
+<span class="material-symbols-outlined text-white text-3xl">build</span>
+</div>
+<p class="mt-2 text-xs bg-black/70 px-2 py-1 rounded-full">Mechanic En Route</p>
+</div>
+
+<!-- INFO PANEL -->
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-20">
+<div class="bg-background-dark/95 p-6 rounded-2xl shadow-2xl border border-white/10">
+
+<div class="flex justify-between mb-4">
+<div>
+<p class="text-xs text-gray-400 uppercase">Service Type</p>
+<p class="text-lg font-bold text-primary" id="issueText"></p>
+</div>
+<div>
+<p class="text-xs text-gray-400 uppercase">District</p>
+<p class="text-sm font-medium" id="districtText"></p>
+</div>
+</div>
+
+<div class="grid grid-cols-2 gap-6 text-center">
+<div>
+<p class="text-xs text-gray-400 uppercase">ETA</p>
+<p class="text-4xl font-bold text-primary"><span id="eta">15</span> mins</p>
+</div>
+<div>
+<p class="text-xs text-gray-400 uppercase">Distance</p>
+<p class="text-4xl font-bold"><span id="distance">5.0</span> km</p>
+</div>
+</div>
+
+<div class="mt-6 flex gap-4">
+<button onclick="callMechanic()" class="flex-1 bg-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">call</span>Call Mechanic
+</button>
+<button onclick="cancelRequest()" class="flex-1 bg-red-600 py-4 rounded-xl font-bold">Cancel</button>
+</div>
+
+</div>
+</div>
+
+</main>
+</div>
+
+<script>
+document.getElementById("issueText").innerText = issueType;
+document.getElementById("districtText").innerText = userDistrict + ", Kerala";
+
+// Marker positions in %
+let userPos = {x: 70, y: 65};
+let mechPos = {x: 20, y: 20};
+
+function updateMarkerPositions(){
+    document.getElementById("userMarker").style.left = userPos.x + "%";
+    document.getElementById("userMarker").style.top = userPos.y + "%";
+    document.getElementById("mechMarker").style.left = mechPos.x + "%";
+    document.getElementById("mechMarker").style.top = mechPos.y + "%";
+}
+updateMarkerPositions();
+
+// Simulated movement
+function updateTracking(){
+    mechPos.x += (userPos.x - mechPos.x) * 0.08;
+    mechPos.y += (userPos.y - mechPos.y) * 0.08;
+
+    const dx = userPos.x - mechPos.x;
+    const dy = userPos.y - mechPos.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+
+    document.getElementById("distance").innerText = (dist/2).toFixed(1);
+    document.getElementById("eta").innerText = Math.max(2, Math.round(dist/3));
+
+    updateMarkerPositions();
+
+    if(dist < 2){
+        document.getElementById("eta").innerText = "Arriving";
+        clearInterval(sim);
+        localStorage.setItem("serviceStatus","Completed");
+        setTimeout(()=> {
+            alert("Mechanic has arrived!");
+            window.location.href = "service_history.html";
+        }, 4000);
+    }
+}
+
+let sim = setInterval(updateTracking, 3000);
+
+function callMechanic(){
+    alert("Calling Mechanic...\nRESQ Support Connected");
+}
+
+function cancelRequest(){
+    localStorage.setItem("serviceStatus","Cancelled");
+    alert("Request Cancelled");
+    window.location.href = "user_dash.html";
+}
+
+function goHome(){
+    window.location.href = "user_dash.html";
+}
+</script>
+
+</body>
+</html>
