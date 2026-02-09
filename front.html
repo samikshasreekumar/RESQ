@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RESQ - Emergency Roadside Assistance Kerala</title>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#f27f0d",
+        "background-light": "#f8f7f5",
+        "background-dark": "#181411",
+      },
+      fontFamily: {
+        display: ["Lexend", "sans-serif"]
+      }
+    }
+  }
+}
+</script>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen">
+
+<div class="min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-md bg-white dark:bg-[#27211b] p-8 rounded-xl shadow-2xl">
+
+    <h1 class="text-4xl font-extrabold text-center text-primary">RESQ</h1>
+    <p class="text-center text-gray-500 mb-6">
+      Emergency Roadside Assistance – Kerala
+    </p>
+
+    <!-- Role Switch -->
+    <div class="flex bg-gray-100 dark:bg-[#393028] rounded-full p-1 mb-6">
+      <label class="flex-1 text-center py-2 cursor-pointer rounded-full font-semibold transition
+        has-[:checked]:bg-white has-[:checked]:text-primary">
+        <input type="radio" name="role" value="user" checked hidden>
+        User
+      </label>
+
+      <label class="flex-1 text-center py-2 cursor-pointer rounded-full font-semibold transition
+        has-[:checked]:bg-white has-[:checked]:text-primary">
+        <input type="radio" name="role" value="mechanic" hidden>
+        Mechanic
+      </label>
+
+      <label class="flex-1 text-center py-2 cursor-pointer rounded-full font-semibold transition
+        has-[:checked]:bg-white has-[:checked]:text-primary">
+        <input type="radio" name="role" value="admin" hidden>
+        Admin
+      </label>
+    </div>
+
+    <!-- Mobile Input -->
+    <label class="font-semibold text-white">Mobile Number</label>
+    <input
+      id="phone"
+      type="tel"
+      placeholder="Enter 10-digit mobile number"
+      class="w-full mt-2 p-3 rounded-xl border-2 border-orange-400
+             bg-[#1f1a15]
+             text-white
+             placeholder-white/60
+             focus:outline-none focus:ring-2 focus:ring-orange-500
+             focus:border-orange-500 transition"
+    >
+
+    <button
+      onclick="sendOTP()"
+      class="w-full h-14 mt-6 bg-primary text-white text-lg font-bold rounded-xl hover:opacity-90 transition">
+      Get OTP
+    </button>
+
+    <div id="recaptcha-container"></div>
+  </div>
+</div>
+
+<script>
+/* Firebase Config */
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDuKVyGt8fIEZXwlA8is0rojpllKioH4ck",
+  authDomain: "frontend-a9a49.firebaseapp.com",
+  projectId: "frontend-a9a49",
+  storageBucket: "frontend-a9a49.firebasestorage.app",
+  messagingSenderId: "869024091089",
+  appId: "1:869024091089:web:c15c3989be8e1d3741aef0",
+  measurementId: "G-SB3GM5MN4G"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+let recaptchaVerifier;
+
+/* Init reCAPTCHA */
+window.onload = () => {
+  recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+    'recaptcha-container',
+    { size: 'invisible' }
+  );
+};
+
+/* Send OTP */
+function sendOTP() {
+  const phone = document.getElementById("phone").value.trim();
+  const role = document.querySelector('input[name="role"]:checked').value;
+
+  if (!/^[6-9]\d{9}$/.test(phone)) {
+    alert("Enter a valid Indian mobile number");
+    return;
+  }
+
+  const fullPhone = "+91" + phone;
+
+  firebase.auth()
+    .signInWithPhoneNumber(fullPhone, recaptchaVerifier)
+    .then((confirmationResult) => {
+      localStorage.setItem("verificationId", confirmationResult.verificationId);
+      localStorage.setItem("phone", fullPhone);
+      localStorage.setItem("role", role);
+
+      alert("OTP sent successfully ✅");
+      window.location.href = "otp.html";
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+}
+</script>
+
+</body>
+</html>

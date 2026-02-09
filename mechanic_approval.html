@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mechanic Approval</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#181411] text-white min-h-screen flex flex-col items-center justify-center p-6">
+
+<h1 class="text-3xl font-bold mb-6">Pending Service Request</h1>
+
+<p class="mb-2 text-gray-300">User requested: <span id="issueType"></span></p>
+<p class="mb-6 text-gray-300">Fare: ₹<span id="fare"></span></p>
+<p class="mb-6 text-gray-300">Location: Lat <span id="userLat"></span>, Lng <span id="userLng"></span></p>
+
+<button onclick="approveRequest()" class="bg-green-500 px-6 py-3 rounded font-bold">Approve</button>
+
+<script>
+document.getElementById("issueType").innerText = localStorage.getItem("issueType") || "";
+document.getElementById("fare").innerText = localStorage.getItem("fare") || "";
+document.getElementById("userLat").innerText = localStorage.getItem("userLat") || "";
+document.getElementById("userLng").innerText = localStorage.getItem("userLng") || "";
+
+function approveRequest(){
+  localStorage.setItem("requestStatus", "approved");
+  alert("Service request approved. User can now track.");
+}
+</script>
+
+</body>
+</html>
+
+

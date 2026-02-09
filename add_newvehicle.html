@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Add New Vehicle - Roadside Kerala</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#f27f0d",
+        "background-light": "#f8f7f5",
+        "background-dark": "#221910",
+      },
+      fontFamily: { display: ["Lexend", "sans-serif"] },
+      borderRadius: {
+        DEFAULT: "1rem",
+        lg: "2rem",
+        xl: "3rem",
+        full: "9999px"
+      },
+    },
+  },
+}
+</script>
+
+<style>
+body { font-family: 'Lexend', sans-serif; }
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+}
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+
+<!-- 🔒 LOGIN CHECK -->
+<script>
+if (localStorage.getItem("role") !== "user") {
+  window.location.href = "front.html";
+}
+</script>
+
+<div class="layout-container flex h-full grow flex-col">
+
+<!-- HEADER (UNCHANGED) -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-[#393028] px-6 lg:px-40 py-4 bg-background-light dark:bg-background-dark sticky top-0 z-50">
+  <div class="flex items-center gap-4 text-primary">
+    <div class="size-8">
+      <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" fill="currentColor"></path>
+      </svg>
+    </div>
+    <h2 class="text-xl font-bold">Roadside Kerala</h2>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="flex-1 flex flex-col items-center px-4 py-12">
+<div class="w-full max-w-[640px] flex flex-col gap-8">
+
+<!-- TITLE -->
+<div>
+<h1 class="text-4xl font-extrabold">Add New Vehicle</h1>
+<p class="text-slate-500 dark:text-[#baab9c] text-lg">
+Add your vehicle details for immediate assistance across Kerala.
+</p>
+</div>
+
+<!-- FORM CARD -->
+<div class="bg-white dark:bg-[#27211b]/50 p-8 rounded-xl border border-slate-200 dark:border-[#54473b] shadow-sm">
+
+<form class="flex flex-col gap-6" onsubmit="return false;">
+
+<!-- MAKE / MODEL -->
+<div class="flex flex-col gap-2">
+<label class="font-semibold">Vehicle Make & Model</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">directions_car</span>
+<input
+  id="vehicleModel"
+  class="form-input h-14 pl-12 pr-4 rounded-xl bg-slate-50 dark:bg-[#27211b]"
+  placeholder="Maruti Suzuki Swift / Honda Activa">
+</div>
+</div>
+
+<!-- NUMBER -->
+<div class="flex flex-col gap-2">
+<label class="font-semibold">License Plate Number</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">tag</span>
+<input
+  id="vehicleNumber"
+  class="form-input h-14 pl-12 pr-4 rounded-xl bg-slate-50 dark:bg-[#27211b]"
+  placeholder="KL 01 AB 1234">
+</div>
+</div>
+
+<!-- VEHICLE TYPE -->
+<div class="flex flex-col gap-3">
+<label class="font-semibold">Vehicle Type</label>
+
+<div class="grid grid-cols-3 gap-4">
+
+<label for="car" class="cursor-pointer group">
+<input id="car" class="peer hidden" name="vehicleType" type="radio" value="Car" checked>
+<div class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-slate-200 dark:border-[#54473b]
+bg-slate-50 dark:bg-[#27211b]
+peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+<span class="material-symbols-outlined text-3xl peer-checked:text-primary">directions_car</span>
+<span class="text-sm font-bold">Car</span>
+</div>
+</label>
+
+<label for="bike" class="cursor-pointer group">
+<input id="bike" class="peer hidden" name="vehicleType" type="radio" value="Bike">
+<div class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-slate-200 dark:border-[#54473b]
+bg-slate-50 dark:bg-[#27211b]
+peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+<span class="material-symbols-outlined text-3xl peer-checked:text-primary">moped</span>
+<span class="text-sm font-bold">Bike</span>
+</div>
+</label>
+
+<label for="heavy" class="cursor-pointer group">
+<input id="heavy" class="peer hidden" name="vehicleType" type="radio" value="Heavy">
+<div class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-slate-200 dark:border-[#54473b]
+bg-slate-50 dark:bg-[#27211b]
+peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+<span class="material-symbols-outlined text-3xl peer-checked:text-primary">local_shipping</span>
+<span class="text-sm font-bold">Heavy</span>
+</div>
+</label>
+
+</div>
+</div>
+
+<!-- SAVE -->
+<button
+  type="button"
+  onclick="saveVehicle()"
+  class="w-full flex h-14 items-center justify-center gap-2 rounded-xl bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+<span class="material-symbols-outlined">save</span>
+Save Vehicle
+</button>
+
+</form>
+</div>
+</div>
+</main>
+</div>
+
+<script>
+function saveVehicle() {
+  const model = document.getElementById("vehicleModel").value.trim();
+  const number = document.getElementById("vehicleNumber").value.trim();
+  const type = document.querySelector('input[name="vehicleType"]:checked').value;
+
+  if (!model || !number) {
+    alert("Please fill all vehicle details");
+    return;
+  }
+
+  const vehicle = { model, number, type };
+  localStorage.setItem("vehicle", JSON.stringify(vehicle));
+
+  window.location.href = "service.html";
+}
+</script>
+
+</body>
+</html>

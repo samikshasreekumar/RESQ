@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>User Dashboard - RESQ Kerala</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script>
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                primary: "#f27f0d",
+                "background-light": "#f8f7f5",
+                "background-dark": "#181411",
+            },
+            fontFamily: { display: ["Lexend"] }
+        },
+    },
+}
+</script>
+
+<style>
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+}
+.emergency-btn-shadow {
+  box-shadow: 0 0 40px rgba(242, 127, 13, 0.4);
+}
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-white min-h-screen">
+
+<!-- 🔒 LOGIN CHECK -->
+<script>
+if (localStorage.getItem("role") !== "user") {
+  window.location.href = "front.html";
+}
+</script>
+
+<div class="flex flex-col min-h-screen">
+
+<header class="flex justify-between items-center px-6 py-4 border-b border-white/10">
+  <div>
+    <h2 class="text-xl font-bold text-primary">RESQ Kerala</h2>
+    <p class="text-xs text-gray-400">
+      Welcome, <span id="usernameText">User</span>
+    </p>
+  </div>
+  <button onclick="logout()" class="text-sm text-red-400">Logout</button>
+</header>
+
+<main class="flex-1 px-6 py-10 max-w-4xl mx-auto">
+
+<!-- 🚨 EMERGENCY BUTTON -->
+<div class="text-center mb-12">
+  <h1 class="text-4xl font-bold mb-8">Need Immediate Help?</h1>
+
+  <button
+    onclick="requestHelp('Emergency Breakdown')"
+    class="w-64 h-64 rounded-full bg-gradient-to-br from-red-600 via-primary to-yellow-500 emergency-btn-shadow text-white flex flex-col justify-center items-center mx-auto">
+    <span class="material-symbols-outlined text-6xl mb-2">emergency_share</span>
+    GET HELP NOW
+  </button>
+
+  <p class="mt-4 text-sm text-gray-400">
+    Instant roadside assistance anywhere in Kerala
+  </p>
+</div>
+
+<!-- 🚗 VEHICLE SECTION -->
+<div class="mb-10">
+  <h3 class="text-lg font-bold mb-3">Manage Vehicles</h3>
+  <button
+    onclick="window.location.href='add_newvehicle.html'"
+    class="bg-primary px-4 py-2 rounded-lg hover:scale-105 transition">
+    Add / Edit Vehicles
+  </button>
+</div>
+
+<!-- 🔧 ISSUE TYPES -->
+<div>
+  <h3 class="text-lg font-bold mb-4">Select Issue Type</h3>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+    <button onclick="requestHelp('Flat Tyre')" class="p-4 bg-white/5 rounded-xl hover:bg-white/10">🛞 Flat Tyre</button>
+    <button onclick="requestHelp('Battery')" class="p-4 bg-white/5 rounded-xl hover:bg-white/10">🔋 Battery</button>
+    <button onclick="requestHelp('Engine')" class="p-4 bg-white/5 rounded-xl hover:bg-white/10">⚙ Engine Issue</button>
+    <button onclick="requestHelp('Fuel')" class="p-4 bg-white/5 rounded-xl hover:bg-white/10">⛽ Out of Fuel</button>
+  </div>
+</div>
+
+<!-- 📜 HISTORY -->
+<button
+  onclick="window.location.href='service_history.html'"
+  class="bg-white/10 px-6 py-3 rounded-lg hover:bg-white/20">
+  View Service History
+</button>
+
+</main>
+</div>
+
+<script>
+/* 👤 USERNAME SAFE DISPLAY */
+const username =
+  localStorage.getItem("username") ||
+  localStorage.getItem("phone") ||
+  "User";
+
+document.getElementById("usernameText").innerText = username;
+
+/* 🚨 REQUEST HELP */
+function requestHelp(issue) {
+  if (!issue) return;
+
+  localStorage.setItem("issueType", issue);
+  localStorage.setItem("serviceStatus", "Selecting Service");
+  window.location.href = "service.html";
+}
+
+/* 🔓 LOGOUT */
+function logout() {
+  localStorage.clear();
+  window.location.href = "front.html";
+}
+</script>
+
+</body>
+</html>

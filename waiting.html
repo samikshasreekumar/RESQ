@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waiting for Mechanic Approval</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#181411] text-white min-h-screen flex flex-col items-center justify-center p-6">
+
+<h1 class="text-3xl font-bold mb-6">Waiting for Mechanic Approval...</h1>
+<p class="mb-6 text-gray-300">Mechanic: <span id="mechanicName"></span></p>
+<p class="text-gray-400 mb-6">Please wait while the mechanic approves your request.</p>
+
+<script>
+const currentRequest = JSON.parse(localStorage.getItem("currentRequest") || "{}");
+document.getElementById("mechanicName").innerText = currentRequest.mechanic || "";
+
+function checkStatus(){
+  const status = localStorage.getItem("requestStatus");
+  if(status === "approved"){
+    window.location.href = "mechanic_tracking.html";
+  } else {
+    setTimeout(checkStatus, 2000); // check every 2 seconds
+  }
+}
+
+// Start checking automatically
+checkStatus();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Select Service - RESQ Kerala</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<style>
+body { font-family: 'Lexend', sans-serif; }
+.selected { box-shadow: 0 0 0 3px #f27f0d inset; }
+</style>
+</head>
+
+<body class="bg-[#181411] text-white min-h-screen px-6 py-10">
+
+<h1 class="text-3xl font-bold mb-6">Select Service</h1>
+
+<!-- SERVICE TYPES -->
+<div class="grid grid-cols-2 gap-4 mb-8">
+  <button onclick="selectService(this,'Flat Tyre')" class="service p-4 bg-white/10 rounded">🛞 Flat Tyre</button>
+  <button onclick="selectService(this,'Battery')" class="service p-4 bg-white/10 rounded">🔋 Battery</button>
+  <button onclick="selectService(this,'Fuel')" class="service p-4 bg-white/10 rounded">⛽ Fuel</button>
+  <button onclick="selectService(this,'Breakdown')" class="service p-4 bg-white/10 rounded">🚗 Breakdown</button>
+</div>
+
+<!-- LOCATION -->
+<button onclick="detectLocation()" class="bg-orange-500 px-4 py-3 rounded mb-6">
+📍 Detect My Location
+</button>
+
+<p id="locationText" class="text-sm text-gray-300 mb-6"></p>
+
+<!-- MECHANICS -->
+<h2 class="text-xl font-semibold mb-4">Available Mechanics</h2>
+<div id="mechanicList" class="space-y-3"></div>
+
+<!-- PRICE -->
+<div class="mt-8 bg-orange-500/10 p-6 rounded">
+<p class="text-lg font-semibold">Estimated Price</p>
+<p class="text-3xl font-bold text-orange-500">₹<span id="price">0</span></p>
+
+<button onclick="confirmService()" class="mt-6 w-full py-3 bg-orange-500 rounded text-lg font-bold">
+Confirm Request
+</button>
+</div>
+
+<script>
+let selectedService = "";
+let userLat, userLng;
+let selectedMechanic = null;
+
+const PER_KM = 15;
+
+// Service base prices
+const SERVICE_PRICES = {
+  "Flat Tyre": 299,
+  "Battery": 349,
+  "Fuel": 399,
+  "Breakdown": 449
+};
+
+// Mechanics data
+const mechanics = [
+  { name: "Amith", lat: 9.935, lng: 76.271, services: ["Flat Tyre", "Fuel"] },
+  { name: "Varma", lat: 9.925, lng: 76.255, services: ["Flat Tyre", "Battery"] },
+  { name: "Navneet", lat: 9.945, lng: 76.265, services: ["Flat Tyre", "Battery", "Breakdown"] },
+  { name: "Tony", lat: 9.915, lng: 76.245, services: ["Fuel"] }
+];
+
+function selectService(btn, service){
+  selectedService = service;
+  document.querySelectorAll(".service").forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+  document.getElementById("price").innerText = SERVICE_PRICES[service];
+
+  if(userLat && userLng){
+    showMechanics();
+  }
+}
+
+function detectLocation(){
+  navigator.geolocation.getCurrentPosition(pos => {
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+
+    document.getElementById("locationText").innerText =
+      `Location detected (Lat: ${userLat.toFixed(4)}, Lng: ${userLng.toFixed(4)})`;
+
+    if(selectedService){
+      showMechanics();
+    }
+  });
+}
+
+function showMechanics(){
+  const list = document.getElementById("mechanicList");
+  list.innerHTML = "";
+
+  const filtered = mechanics.filter(m =>
+    m.services.includes(selectedService)
+  );
+
+  filtered.forEach(m => {
+    const distance = getDistance(userLat, userLng, m.lat, m.lng);
+    const price = Math.round(SERVICE_PRICES[selectedService] + distance * PER_KM);
+
+    const div = document.createElement("div");
+    div.className = "p-4 bg-white/5 rounded cursor-pointer";
+    div.innerHTML = `
+      <p class="font-bold">${m.name}</p>
+      <p class="text-sm">Distance: ${distance.toFixed(1)} km</p>
+      <p class="text-orange-500 font-semibold">₹${price}</p>
+    `;
+
+    div.onclick = () => {
+      document.querySelectorAll("#mechanicList div").forEach(d => d.classList.remove("selected"));
+      div.classList.add("selected");
+      selectedMechanic = m;
+      document.getElementById("price").innerText = price;
+    };
+
+    list.appendChild(div);
+  });
+
+  if(filtered.length === 0){
+    list.innerHTML = `<p class="text-gray-400">No mechanics available for this service</p>`;
+  }
+}
+
+function getDistance(lat1, lon1, lat2, lon2){
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) ** 2;
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+}
+
+// Confirm service and push to pending requests
+function confirmService(){
+  if(!selectedService || !selectedMechanic || !userLat || !userLng){
+    alert("Select service, mechanic, and detect location");
+    return;
+  }
+
+  const request = {
+    userName: "User", // Replace with actual user input if available
+    issue: selectedService,
+    location: `Lat: ${userLat.toFixed(4)}, Lng: ${userLng.toFixed(4)}`,
+    mechanic: selectedMechanic.name,
+    status: "pending",
+    fare: document.getElementById("price").innerText
+  };
+
+  let pendingRequests = JSON.parse(localStorage.getItem("pendingRequests") || "[]");
+  pendingRequests.push(request);
+  localStorage.setItem("pendingRequests", JSON.stringify(pendingRequests));
+  localStorage.setItem("currentRequest", JSON.stringify(request));
+  localStorage.setItem("requestStatus", "pending");
+
+  window.location.href = "waiting.html";
+}
+</script>
+
+</body>
+</html>

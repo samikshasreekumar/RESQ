@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RESQ Live Tracking</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"
+  async defer>
+</script>
+
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#f27f0d",
+        "background-light": "#f8f7f5",
+        "background-dark": "#221910",
+      },
+      fontFamily: { display: ["Lexend"] }
+    },
+  },
+}
+</script>
+
+<style>
+body { font-family: 'Lexend', sans-serif; }
+#map { height: 100%; width: 100%; }
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-white overflow-hidden">
+
+<script>
+if(localStorage.getItem("role") !== "user"){
+  window.location.href = "front.html";
+}
+
+const issueType = localStorage.getItem("issueType") || "Breakdown";
+const userLat = parseFloat(localStorage.getItem("userLat")) || 9.9312;
+const userLng = parseFloat(localStorage.getItem("userLng")) || 76.2673;
+const mechLat = parseFloat(localStorage.getItem("mechLat")) || 9.945;
+const mechLng = parseFloat(localStorage.getItem("mechLng")) || 76.255;
+</script>
+
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+
+<header class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-4 bg-background-dark/80 backdrop-blur-md border-b border-white/10">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-4xl">home_repair_service</span>
+<div>
+<h2 class="text-lg font-bold">RESQ Kerala Assistance</h2>
+<p class="text-xs text-primary uppercase tracking-wider">Live Mechanic Tracking</p>
+</div>
+</div>
+<button onclick="goHome()" class="text-sm text-gray-300 hover:text-primary">Dashboard</button>
+</header>
+
+<main class="relative flex-1 w-full h-full pt-20">
+<div id="map"></div>
+
+<!-- INFO PANEL -->
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-20">
+<div class="bg-background-dark/95 p-6 rounded-2xl shadow-2xl border border-white/10">
+
+<div class="flex justify-between mb-4">
+<div>
+<p class="text-xs text-gray-400 uppercase">Service Type</p>
+<p class="text-lg font-bold text-primary" id="issueText"></p>
+</div>
+<div>
+<p class="text-xs text-gray-400 uppercase">Status</p>
+<p class="text-sm font-medium">On the way</p>
+</div>
+</div>
+
+<div class="grid grid-cols-2 gap-6 text-center">
+<div>
+<p class="text-xs text-gray-400 uppercase">ETA</p>
+<p class="text-4xl font-bold text-primary"><span id="eta">15</span> mins</p>
+</div>
+<div>
+<p class="text-xs text-gray-400 uppercase">Distance</p>
+<p class="text-4xl font-bold"><span id="distance">0</span> km</p>
+</div>
+</div>
+
+<div class="mt-6 flex gap-4">
+<button onclick="callMechanic()" class="flex-1 bg-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">call</span>Call Mechanic
+</button>
+<button onclick="cancelRequest()" class="flex-1 bg-red-600 py-4 rounded-xl font-bold">Cancel</button>
+</div>
+
+</div>
+</div>
+
+</main>
+</div>
+
+<script>
+document.getElementById("issueText").innerText = issueType;
+
+let map, userMarker, mechMarker, directionsService, directionsRenderer;
+let currentStep = 0;
+let routePath = [];
+
+function initMap(){
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: userLat, lng: userLng },
+    zoom: 14,
+    styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }]
+  });
+
+  userMarker = new google.maps.Marker({
+    position: { lat: userLat, lng: userLng },
+    map,
+    icon: {
+      url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+    }
+  });
+
+  mechMarker = new google.maps.Marker({
+    position: { lat: mechLat, lng: mechLng },
+    map,
+    icon: {
+      url: "https://maps.google.com/mapfiles/ms/icons/orange-dot.png"
+    }
+  });
+
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({
+    map,
+    suppressMarkers: true,
+    polylineOptions: { strokeColor: "#f27f0d", strokeWeight: 5 }
+  });
+
+  calculateRoute();
+}
+
+function calculateRoute(){
+  directionsService.route({
+    origin: { lat: mechLat, lng: mechLng },
+    destination: { lat: userLat, lng: userLng },
+    travelMode: google.maps.TravelMode.DRIVING
+  }, (result, status) => {
+    if(status === "OK"){
+      directionsRenderer.setDirections(result);
+      routePath = result.routes[0].overview_path;
+      moveMechanic();
+    }
+  });
+}
+
+function moveMechanic(){
+  if(currentStep >= routePath.length){
+    alert("Mechanic Arrived!");
+    return;
+  }
+
+  mechMarker.setPosition(routePath[currentStep]);
+  map.panTo(routePath[currentStep]);
+
+  const remaining = routePath.length - currentStep;
+  document.getElementById("distance").innerText = (remaining * 0.04).toFixed(1);
+  document.getElementById("eta").innerText = Math.max(1, Math.round(remaining / 6));
+
+  currentStep++;
+  setTimeout(moveMechanic, 1500);
+}
+
+function callMechanic(){
+  alert("Calling mechanic...");
+}
+
+function cancelRequest(){
+  alert("Request cancelled");
+  window.location.href = "user_dash.html";
+}
+
+function goHome(){
+  window.location.href = "user_dash.html";
+}
+</script>
+
+</body>
+</html>

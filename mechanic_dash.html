@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanic Dashboard - RESQ</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#f27f0d",
+        bgDark: "#1a1612"
+      },
+      fontFamily: { display: ["Lexend"] }
+    }
+  }
+}
+</script>
+</head>
+<body class="bg-slate-100 dark:bg-bgDark font-display min-h-screen flex flex-col">
+
+<header class="px-6 py-4 bg-white dark:bg-bgDark border-b">
+  <h1 class="text-xl font-bold text-primary">RESQ – Mechanic Dashboard</h1>
+</header>
+
+<main class="flex-1 p-6 max-w-2xl mx-auto">
+  <h2 class="text-lg font-bold mb-4">Pending Service Requests</h2>
+  <div id="requestList" class="space-y-4 mb-6"></div>
+
+  <div id="trackingCard" class="hidden bg-white/5 p-6 rounded-xl shadow mb-6">
+    <h2 class="text-lg font-bold mb-2">Tracking / Service Status</h2>
+    <p><b>Customer:</b> <span id="custName"></span></p>
+    <p><b>Issue:</b> <span id="issueType"></span></p>
+    <p><b>Location:</b> <span id="custLocation"></span></p>
+    <p class="mt-4"><b>Status:</b> <span id="statusText" class="text-primary font-bold text-xl"></span></p>
+
+    <div class="grid grid-cols-1 gap-3 mt-4">
+      <button onclick="updateStatus('Arrived')" class="py-2 rounded-xl bg-primary text-white font-bold">Arrived at Location</button>
+      <button onclick="updateStatus('Work Started')" class="py-2 rounded-xl bg-yellow-500 text-white font-bold">Start Work</button>
+      <button onclick="updateStatus('Completed')" class="py-2 rounded-xl bg-green-600 text-white font-bold">Complete Service</button>
+    </div>
+  </div>
+</main>
+
+<script>
+// Load pending requests
+let pendingRequests = JSON.parse(localStorage.getItem("pendingRequests") || "[]");
+const requestList = document.getElementById("requestList");
+
+function renderRequests(){
+  requestList.innerHTML = "";
+
+  if(pendingRequests.length === 0){
+    requestList.innerHTML = `<p class="text-gray-400">No pending requests</p>`;
+    return;
+  }
+
+  pendingRequests.forEach((req, index) => {
+    const div = document.createElement("div");
+    div.className = "p-4 bg-white/10 rounded flex justify-between items-center";
+    div.innerHTML = `
+      <div>
+        <p class="font-bold">${req.userName}</p>
+        <p class="text-sm text-gray-300">Issue: ${req.issue}</p>
+        <p class="text-sm text-gray-400">Location: ${req.location}</p>
+      </div>
+      <div class="flex gap-2">
+        <button class="py-1 px-3 rounded bg-green-600 text-white font-bold" onclick="approveRequest(${index})">Approve</button>
+        <button class="py-1 px-3 rounded bg-red-500 text-white font-bold" onclick="rejectRequest(${index})">Reject</button>
+      </div>
+    `;
+    requestList.appendChild(div);
+  });
+}
+
+// Approve request
+function approveRequest(index){
+  const req = pendingRequests[index];
+  req.status = "approved";
+  localStorage.setItem("currentRequest", JSON.stringify(req));
+  localStorage.setItem("requestStatus", "approved");
+  pendingRequests.splice(index,1);
+  localStorage.setItem("pendingRequests", JSON.stringify(pendingRequests));
+  renderRequests();
+  showTracking(req);
+}
+
+// Reject request
+function rejectRequest(index){
+  pendingRequests.splice(index,1);
+  localStorage.setItem("pendingRequests", JSON.stringify(pendingRequests));
+  renderRequests();
+}
+
+// Show tracking card
+function showTracking(req){
+  document.getElementById("trackingCard").classList.remove("hidden");
+  document.getElementById("custName").innerText = req.userName;
+  document.getElementById("issueType").innerText = req.issue;
+  document.getElementById("custLocation").innerText = req.location;
+  document.getElementById("statusText").innerText = "Approved";
+}
+
+// Update status
+function updateStatus(status){
+  document.getElementById("statusText").innerText = status;
+  if(status === "Completed"){
+    alert("Service Completed!");
+  }
+}
+
+renderRequests();
+</script>
+
+</body>
+</html>
