@@ -101,19 +101,35 @@
     <!-- Temporary alert container -->
     <div id="adminAlertContainer" class="fixed top-8 right-8 z-[100] flex flex-col gap-4"></div>
 
-    <!-- ===== ACTIVITY LOG SECTION ===== -->
+    <!-- ===== REQUEST TABLE ===== -->
     <div class="dashboard-card overflow-hidden">
       <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-        <h3 class="font-black uppercase tracking-widest text-sm text-slate-400">System Activity Log</h3>
+        <h3 class="font-black uppercase tracking-widest text-sm text-slate-400">Live Request Stream</h3>
         <div class="flex items-center gap-2">
           <span class="size-2 rounded-full bg-emerald-500 animate-ping"></span>
           <span class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Live Monitoring</span>
         </div>
       </div>
-      <div id="activityLog" class="max-h-[500px] overflow-y-auto divide-y divide-white/[0.02] bg-white/[0.01]">
-        <div class="p-12 text-center text-slate-500 font-bold italic tracking-wide">
-          Waiting for system events...
-        </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left">
+          <thead>
+            <tr class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/5">
+              <th class="px-8 py-6">Request ID</th>
+              <th class="px-8 py-6">Location</th>
+              <th class="px-8 py-6">Customer</th>
+              <th class="px-8 py-6">Issue</th>
+              <th class="px-8 py-6">Status</th>
+              <th class="px-8 py-6">Time</th>
+            </tr>
+          </thead>
+          <tbody id="requestsBody" class="divide-y divide-white/[0.02]">
+            <tr>
+              <td colspan="6" class="text-center py-20 text-slate-500 font-bold tracking-wide italic">
+                No active requests in queue...
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -183,73 +199,48 @@
         document.querySelectorAll(".text-4xl")[1].innerText = stats.pending || 0;
         document.querySelectorAll(".text-4xl")[2].innerText = stats.completed || 0;
 
-        // 2. Activity Log
+        // 2. Requests Table
         const reqRes = await fetch(`${API_BASE}/requests`);
         const requests = await reqRes.json();
-        
-        // Sort by updatedAt descending
-        requests.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-        renderActivityLog(requests);
+        renderTable(requests);
 
       } catch (error) {
         console.error("Dashboard error:", error);
       }
     }
 
-    // ===== LOG UTILITIES =====
-    function getLogContext(req) {
-      const timeStr = new Date(req.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      const config = {
-        'Pending': { icon: 'sensors', color: 'text-blue-500', bg: 'bg-blue-500/10', msg: `New service request registered for <b class="text-white">${req.issueType}</b> at <span class="text-orange-400">${req.district || 'Kerala'}</span>` },
-        'Approved': { icon: 'handshake', color: 'text-yellow-500', bg: 'bg-yellow-500/10', msg: `Mechanic accepted job for <b class="text-white">${req.userPhone}</b>` },
-        'Arrived': { icon: 'location_on', color: 'text-orange-500', bg: 'bg-orange-500/10', msg: `Professional arrived at customer's location in <span class="text-white">${req.district}</span>` },
-        'Work Started': { icon: 'build', color: 'text-yellow-400', bg: 'bg-yellow-400/10', msg: `Repair work in progress for <b class="text-white">${req.issueType}</b>` },
-        'Completed': { icon: 'verified', color: 'text-emerald-500', bg: 'bg-emerald-500/10', msg: `Service successfully completed for user <b class="text-white">${req.userPhone}</b>` },
-        'Rejected': { icon: 'cancel', color: 'text-red-500', bg: 'bg-red-500/10', msg: `Request rejected by system or professional` },
-        'default': { icon: 'info', color: 'text-slate-500', bg: 'bg-white/5', msg: `System state updated for request ${req.id.split('-')[0]}` }
-      };
-
-      return { ...(config[req.status] || config.default), time: timeStr };
+    // ===== STATUS BADGE =====
+    function getStatusBadge(status) {
+      if (status === "Pending") return `<span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">Pending</span>`;
+      if (status === "Approved" || status === "Arrived" || status === "Work Started") return `<span class="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-xs font-bold">${status}</span>`;
+      if (status === "Completed") return `<span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold">Completed</span>`;
+      if (status === "Rejected") return `<span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">Rejected</span>`;
+      return status;
     }
 
-    // ===== RENDER ACTIVITY LOG =====
-    function renderActivityLog(requests) {
-      const container = document.getElementById("activityLog");
-      container.innerHTML = "";
+    // ===== RENDER TABLE =====
+    function renderTable(requests) {
+      const tbody = document.getElementById("requestsBody");
+      tbody.innerHTML = "";
 
       if (requests.length === 0) {
-        container.innerHTML = `<div class="p-12 text-center text-slate-500 font-bold italic tracking-wide">No system activity detected...</div>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400">No requests yet</td></tr>`;
         return;
       }
 
       requests.forEach(req => {
-        const { icon, color, bg, msg, time } = getLogContext(req);
-        
-        const entry = document.createElement("div");
-        entry.className = "px-8 py-5 flex items-center justify-between hover:bg-white/[0.02] transition-colors group";
-        entry.innerHTML = `
-          <div class="flex items-center gap-6">
-            <div class="size-10 rounded-xl ${bg} ${color} flex items-center justify-center border border-white/5 shadow-inner">
-              <span class="material-symbols-outlined text-xl">${icon}</span>
-            </div>
-            <div>
-              <p class="text-sm text-slate-400 font-medium leading-relaxed font-display">
-                ${msg}
-              </p>
-              <div class="flex items-center gap-3 mt-1">
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-600">REQ: ${req.id.split('-')[0]}...</span>
-                <span class="size-1 rounded-full bg-slate-700"></span>
-                <span class="text-[10px] font-black uppercase tracking-widest text-orange-500/60">${req.district || 'Kerala'}</span>
-              </div>
-            </div>
-          </div>
-          <div class="text-right">
-            <span class="text-xs font-black text-slate-500 tabular-nums group-hover:text-white transition-colors">${time}</span>
-          </div>
-        `;
-        container.appendChild(entry);
+        const row = document.createElement("tr");
+        row.className = "border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition";
+        row.innerHTML = `
+      <td class="px-6 py-4 font-mono text-xs text-gray-500">${req.id.split('-')[0]}...</td>
+      <td class="px-6 py-4 text-sm">${req.district || 'Kerala'}</td>
+      <td class="px-6 py-4 text-sm font-semibold">${req.userPhone}</td>
+      <td class="px-6 py-4 text-sm">${req.issueType}</td>
+      <td class="px-6 py-4 text-sm">${getStatusBadge(req.status)}</td>
+      <td class="px-6 py-4 text-xs text-gray-400">${new Date(req.createdAt).toLocaleString()}</td>
+    `;
+        tbody.appendChild(row);
       });
     }
 
