@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -48,15 +48,20 @@
 <body class="bg-background-light dark:bg-dash-dark font-display text-slate-900 dark:text-white min-h-screen">
 
   <script>
-      (async () => {
-        const phone = localStorage.getItem("phone");
-        const role = localStorage.getItem("role");
-        if (!phone || role !== "user") { window.location.href = "index.html"; return; }
-        try {
-          const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
-          if (!res.ok) { localStorage.clear(); window.location.href = "index.html"; }
-        } catch (e) { /* Fail open */ }
-      })();
+    (async () => {
+      const phone = localStorage.getItem("phone");
+      const role = localStorage.getItem("role");
+      if (!phone || role !== "user") { window.location.href = "index.html"; return; }
+
+      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
+        if (!res.ok) { localStorage.clear(); window.location.href = "index.html"; }
+      } catch (e) { /* Fail open */ }
+    })();
   </script>
 
   <div class="flex h-screen overflow-hidden">
@@ -136,22 +141,22 @@
               <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <button onclick="selectService(this,'Flat Tyre')"
                   class="service-item p-6 bg-slate-50 dark:bg-white/5 border border-transparent rounded-2xl flex flex-col items-center gap-3 hover:bg-primary/5 transition group">
-                  <span class="text-3xl">ðŸ›ž</span>
+                  <span class="text-3xl">🛞</span>
                   <span class="text-[10px] font-bold uppercase tracking-widest">Flat Tyre</span>
                 </button>
                 <button onclick="selectService(this,'Battery')"
                   class="service-item p-6 bg-slate-50 dark:bg-white/5 border border-transparent rounded-2xl flex flex-col items-center gap-4 hover:bg-primary/5 transition group">
-                  <span class="text-3xl">ðŸ”‹</span>
+                  <span class="text-3xl">🔋</span>
                   <span class="text-[10px] font-bold uppercase tracking-widest">Battery</span>
                 </button>
                 <button onclick="selectService(this,'Fuel')"
                   class="service-item p-6 bg-slate-50 dark:bg-white/5 border border-transparent rounded-2xl flex flex-col items-center gap-4 hover:bg-primary/5 transition group">
-                  <span class="text-3xl">â›½</span>
+                  <span class="text-3xl">⛽</span>
                   <span class="text-[10px] font-bold uppercase tracking-widest">Fuel</span>
                 </button>
                 <button onclick="selectService(this,'Breakdown')"
                   class="service-item p-6 bg-slate-50 dark:bg-white/5 border border-transparent rounded-2xl flex flex-col items-center gap-4 hover:bg-primary/5 transition group">
-                  <span class="text-3xl">ðŸš—</span>
+                  <span class="text-3xl">🚗</span>
                   <span class="text-[10px] font-bold uppercase tracking-widest text-center">Breakdown</span>
                 </button>
               </div>
@@ -217,23 +222,23 @@
                 <div class="flex justify-between items-start gap-4">
                   <span
                     class="text-xs font-black uppercase tracking-[0.12em] opacity-60 flex-shrink-0 pt-0.5">Issue</span>
-                  <span id="summaryIssue" class="text-base font-black text-right leading-tight">â€”</span>
+                  <span id="summaryIssue" class="text-base font-black text-right leading-tight">-</span>
                 </div>
                 <div class="flex justify-between items-start gap-4">
                   <span
                     class="text-xs font-black uppercase tracking-[0.12em] opacity-60 flex-shrink-0 pt-0.5">Vehicle</span>
-                  <span id="summaryVeh" class="text-base font-black text-right leading-tight">â€”</span>
+                  <span id="summaryVeh" class="text-base font-black text-right leading-tight">-</span>
                 </div>
                 <div class="flex justify-between items-start gap-4">
                   <span
                     class="text-xs font-black uppercase tracking-[0.12em] opacity-60 flex-shrink-0 pt-0.5">Mechanic</span>
-                  <span id="summaryMechanic" class="text-base font-black text-right leading-tight">â€”</span>
+                  <span id="summaryMechanic" class="text-base font-black text-right leading-tight">-</span>
                 </div>
               </div>
 
               <div class="mb-10">
                 <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-50">Estimated Total</p>
-                <div class="text-5xl font-black">â‚¹<span id="price">0</span></div>
+                <div class="text-5xl font-black">₹<span id="price">0</span></div>
               </div>
 
               <button onclick="confirmService()"
@@ -265,16 +270,21 @@
 
     const phone = localStorage.getItem("phone");
 
-    /* ðŸ‘¤ LOAD USER DATA */
+    /* 👤 LOAD USER DATA */
     async function loadUserData() {
+      const phone = localStorage.getItem("phone");
+      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
+
       try {
         // Sidebar profile
-        const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+        const res = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
         if (res.ok) {
           const user = await res.json();
           document.getElementById("userName").innerText = user.name || "User";
           if (user.profilePhoto) {
-            const photoUrl = `http://localhost:5001/${user.profilePhoto.replace(/\\/g, '/')}`;
+            const photoUrl = `${BACKEND_URL}/${user.profilePhoto.replace(/\\/g, '/')}`;
             document.getElementById("sideProfilePhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
           }
         }
@@ -286,7 +296,7 @@
     }
     loadUserData();
 
-    /* ðŸ”§ SERVICE SELECTION */
+    /* 🔧 SERVICE SELECTION */
     function selectService(btn, service) {
       selectedService = service;
       document.querySelectorAll(".service-item").forEach(b => b.classList.remove("selected-card", "bg-primary/10", "border-primary"));
@@ -300,7 +310,7 @@
       }
     }
 
-    /* ðŸ“ ACCURATE GEOLOCATION */
+    /* 📍 ACCURATE GEOLOCATION */
     async function detectLocation() {
       const detectBtn = document.getElementById("detectBtn");
       const originalContent = detectBtn.innerHTML;
@@ -320,7 +330,7 @@
         userLng = pos.coords.longitude;
 
         const locationInput = document.getElementById("locationInput");
-        locationInput.value = "ðŸ“ Pinpointing precise address...";
+        locationInput.value = "📍 Pinpointing precise address...";
 
         try {
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${userLat}&lon=${userLng}`);
@@ -352,12 +362,16 @@
       }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
     }
 
-    /* ðŸ” FETCH MECHANICS */
+    /* 🔍 FETCH MECHANICS */
     async function fetchMechanics() {
       if (!userLat || !userLng || !selectedService) return;
 
+      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
+
       try {
-        let url = `http://localhost:5001/api/mechanics/nearest?lat=${userLat}&lng=${userLng}&serviceType=${selectedService}`;
+        let url = `${BACKEND_URL}/api/mechanics/nearest?lat=${userLat}&lng=${userLng}&serviceType=${selectedService}`;
         if (userDistrict) {
           url += `&district=${encodeURIComponent(userDistrict)}`;
         }
@@ -399,11 +413,11 @@
                         </div>
                         <div class="text-right">
                              <p class="text-[10px] font-black uppercase text-slate-400">Price</p>
-                             <p class="text-lg font-black text-primary">â‚¹${price}</p>
+                             <p class="text-lg font-black text-primary">₹${price}</p>
                         </div>
                     </div>
                     <p class="font-bold text-lg text-slate-900 dark:text-white leading-tight">${m.name}</p>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">${distance.toFixed(1)} km away â€¢ ${m.district}</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">${distance.toFixed(1)} km away • ${m.district}</p>
                 `;
 
         div.onclick = () => {
@@ -427,7 +441,7 @@
       return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
     }
 
-    /* âœ… CONFIRM REQUEST */
+    /* ✅ CONFIRM REQUEST */
     async function confirmService() {
       if (!selectedService || !selectedMechanic || !userLat || !userLng) {
         alert("Please select a service, detect your location, and choose a mechanic.");
@@ -453,7 +467,11 @@
       };
 
       try {
-        const res = await fetch('http://localhost:5001/api/requests', {
+        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:5001'
+          : 'https://resq-production-4525.up.railway.app';
+
+        const res = await fetch(`${BACKEND_URL}/api/requests`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody)

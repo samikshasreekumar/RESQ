@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -47,8 +47,13 @@
         const phone = localStorage.getItem("phone");
         const role = localStorage.getItem("role");
         if (!phone || role !== "user") { window.location.href = "index.html"; return; }
+
+        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:5001'
+          : 'https://resq-production-4525.up.railway.app';
+
         try {
-          const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+          const res = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
           if (!res.ok) { localStorage.clear(); window.location.href = "index.html"; }
         } catch (e) { /* Fail open */ }
       })();
@@ -202,13 +207,17 @@
     const phone = localStorage.getItem("phone");
 
     async function loadProfile() {
+      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
+
       try {
-        const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+        const res = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
         if (res.ok) {
           const user = await res.json();
           document.getElementById("userName").innerText = user.name || "User";
           if (user.profilePhoto) {
-            const photoUrl = `http://localhost:5001/${user.profilePhoto.replace(/\\/g, '/')}`;
+            const photoUrl = `${BACKEND_URL}/${user.profilePhoto.replace(/\\/g, '/')}`;
             document.getElementById("sideProfilePhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
           }
         }
@@ -229,7 +238,11 @@
       }
 
       try {
-        const res = await fetch('http://localhost:5001/api/vehicles', {
+        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:5001'
+          : 'https://resq-production-4525.up.railway.app';
+
+        const res = await fetch(`${BACKEND_URL}/api/vehicles`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userPhone: phone, model, brand, number, color, type })

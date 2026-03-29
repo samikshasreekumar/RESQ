@@ -1,17 +1,17 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cab Tracking â€” RESQ Kerala</title>
+  <title>Cab Tracking — RESQ Kerala</title>
 
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,700,1,0" rel="stylesheet">
-  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -33,10 +33,10 @@
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family: 'Outfit', sans-serif; background: #0a0a0a; }
 
-    /* â”€â”€ Map â”€â”€ */
+    /* —— Map —— */
     #map { height: 100%; border-radius: 28px; z-index: 1; }
 
-    /* â”€â”€ Animated pulse for user marker â”€â”€ */
+    /* —— Animated pulse for user marker —— */
     .user-pulse {
       width: 22px; height: 22px;
       background: #eab308;
@@ -58,14 +58,14 @@
       100% { transform: scale(2.5); opacity: 0; }
     }
 
-    /* â”€â”€ Gradient BG accents â”€â”€ */
+    /* —— Gradient BG accents —— */
     .accent-orb {
       position: fixed; border-radius: 50%;
       filter: blur(80px); opacity: 0.12;
       pointer-events: none; z-index: 0;
     }
 
-    /* â”€â”€ ETA ring â”€â”€ */
+    /* —— ETA ring —— */
     .eta-ring {
       width: 120px; height: 120px;
       border-radius: 50%;
@@ -86,7 +86,7 @@
       text-align: center;
     }
 
-    /* â”€â”€ Status pill â”€â”€ */
+    /* —— Status pill —— */
     .status-pill {
       display: inline-flex; align-items: center; gap: 8px;
       background: rgba(234,179,8,0.1);
@@ -103,7 +103,7 @@
     }
     @keyframes blink-dot { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
 
-    /* â”€â”€ Info cards â”€â”€ */
+    /* —— Info cards —— */
     .info-card {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
@@ -123,7 +123,7 @@
       font-size: 13px; color: rgba(255,255,255,0.4);
     }
 
-    /* â”€â”€ Arrived overlay â”€â”€ */
+    /* —— Arrived overlay —— */
     #arrivedOverlay {
       position: fixed; inset: 0; z-index: 2000;
       background: rgba(0,0,0,0.92); backdrop-filter: blur(20px);
@@ -160,7 +160,7 @@
       to   { transform: translateY(4px) rotate(4deg); }
     }
 
-    /* â”€â”€ Hide Scrollbar CSS â”€â”€ */
+    /* —— Hide Scrollbar CSS —— */
     .style-scrollbar::-webkit-scrollbar { width: 6px; }
     .style-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
     .style-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -170,7 +170,7 @@
 
 <body class="text-white min-h-screen">
 
-  <!-- â•â• TRIP COMPLETED OVERLAY â•â• -->
+  <!-- —— TRIP COMPLETED OVERLAY —— -->
   <div id="dropoffOverlay" class="fixed inset-0 z-[3000] bg-black/95 backdrop-blur-3xl flex items-center justify-center opacity-0 pointer-events-none transition-all duration-700">
     <div class="max-w-md w-full p-10 bg-gradient-to-br from-green-500/10 to-transparent border border-green-500/20 rounded-[48px] text-center shadow-[0_0_100px_rgba(34,197,94,0.15)] transform scale-90 translate-y-10 transition-all duration-700">
       <div class="size-24 bg-green-500 rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-green-500/40 animate-bounce">
@@ -206,15 +206,15 @@
   <div class="accent-orb" style="width:400px;height:400px;background:#eab308;top:-100px;right:-80px;"></div>
   <div class="accent-orb" style="width:300px;height:300px;background:#f27f0d;bottom:-80px;left:-60px;"></div>
 
-  <!-- â•â• CAB ARRIVED OVERLAY â•â• -->
+  <!-- —— CAB ARRIVED OVERLAY —— -->
   <div id="arrivedOverlay">
     <div class="arrived-card">
-      <div class="arrived-icon">ðŸš–</div>
+      <div class="arrived-icon">🚖</div>
       <div class="status-pill" style="margin-bottom:14px;">
         <span class="status-dot"></span>
         <span style="font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#eab308;">Cab Arrived</span>
       </div>
-      <p style="font-size:30px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;">Your Cab is Here! ðŸŽ‰</p>
+      <p style="font-size:30px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;">Your Cab is Here! 🎉</p>
       <p style="font-size:14px;color:rgba(234,179,8,0.75);font-weight:600;margin-bottom:28px;">
         The driver is waiting at your location.<br>Please head to the cab now.
       </p>
@@ -222,7 +222,7 @@
         style="width:100%;padding:16px;border-radius:18px;border:none;cursor:pointer;
                background:linear-gradient(135deg,rgba(234,179,8,0.8),rgba(202,138,4,1));
                color:#000;font-size:15px;font-weight:900;letter-spacing:1px;">
-        OK â€” I'm heading to the cab!
+        OK — I'm heading to the cab!
       </button>
       <button onclick="window.location.href='mechanic_tracking.html'"
         style="margin-top:12px;width:100%;padding:12px;border-radius:18px;border:1px solid rgba(255,255,255,0.1);
@@ -232,7 +232,7 @@
     </div>
   </div>
 
-  <!-- â•â• MAIN LAYOUT â•â• -->
+  <!-- —— MAIN LAYOUT —— -->
   <div class="relative z-10 flex flex-col h-screen p-4 md:p-6 gap-4 overflow-hidden">
 
     <!-- Header -->
@@ -288,7 +288,7 @@
         <!-- Driver Card -->
         <div class="bg-gradient-to-b from-white/8 to-white/3 border border-white/10 rounded-[28px] p-6 text-center">
           <div class="size-20 rounded-2xl bg-yellow-500/15 border-2 border-yellow-500/30 flex items-center justify-center mx-auto mb-4 text-4xl">
-            ðŸ§‘â€âœˆï¸
+            👨‍✈️
           </div>
           <p class="text-[10px] font-black uppercase tracking-widest text-yellow-400 mb-1">Your Driver</p>
           <h2 class="text-xl font-black text-white mb-1" id="driverName">Loading...</h2>
@@ -297,7 +297,7 @@
           <div class="mt-4 pt-4 border-t border-white/8 flex gap-2">
             <div class="flex-1 info-card text-center p-3">
               <p class="label">Rating</p>
-              <p class="value text-yellow-400" style="font-size:18px;">4.8 â­</p>
+              <p class="value text-yellow-400" style="font-size:18px;">4.8 ⭐</p>
             </div>
             <div class="flex-1 info-card text-center p-3">
               <p class="label">Trips</p>
@@ -320,7 +320,7 @@
 
         <!-- Destination Input -->
         <div class="bg-blue-500/10 border border-blue-500/20 rounded-[24px] p-5">
-          <p class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-2">ðŸ“ Set Drop Location</p>
+          <p class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-2">📍 Set Drop Location</p>
           <div class="flex gap-2">
             <input type="text" id="dropLocationInput" placeholder="Enter safe location..." 
               class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -334,19 +334,19 @@
           
           <button onclick="userNotifyCabPickup()" id="btnPickup" 
             class="w-full py-3 rounded-2xl bg-blue-500/10 border border-blue-500/40 text-blue-400 hover:bg-blue-500 hover:text-white font-black text-sm transition flex items-center justify-center gap-2">
-            ðŸš¶ I am Picked Up
+            🚶 I am Picked Up
           </button>
           
           <button onclick="userNotifyCabDropoff()" id="btnDropoff"
             class="w-full py-3 rounded-2xl bg-green-500/10 border border-green-500/40 text-green-400 hover:bg-green-500 hover:text-white font-black text-sm transition flex items-center justify-center gap-2">
-            ðŸ  Safely Dropped Off
+            🏡 Safely Dropped Off
           </button>
         </div>
 
         <!-- Back button -->
         <button onclick="window.location.href='mechanic_tracking.html'"
           class="w-full py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/50 font-bold text-sm transition">
-          â† Back to Mechanic Tracking
+          ← Back to Mechanic Tracking
         </button>
 
       </div>
@@ -363,13 +363,17 @@
     let mapInstance = null;
     let cabMarker = null;
 
-    // â”€â”€ Load data and init map â”€â”€
+    // —— Load data and init map ——
     async function init() {
       // Guard: must be logged in as user
       if (!uPhone) { window.location.href = "index.html"; return; }
 
+      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
+
       try {
-        const rRes = await fetch(`http://localhost:5001/api/requests/${currentRequestId}`);
+        const rRes = await fetch(`${BACKEND_URL}/api/requests/${currentRequestId}`);
         if (!rRes.ok) throw new Error("Request not found");
         const data = await rRes.json();
         const req = data.request;
@@ -394,7 +398,7 @@
     function initMap(userLat, userLng) {
       mapInstance = L.map('map').setView([userLat, userLng], 14);
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: 'Â© OpenStreetMap, Â© CartoDB'
+        attribution: '© OpenStreetMap, © CartoDB'
       }).addTo(mapInstance);
 
       // User marker (pulsing yellow)
@@ -406,7 +410,7 @@
       });
       L.marker([userLat, userLng], { icon: userIcon })
         .addTo(mapInstance)
-        .bindPopup("ðŸ“ Your Location");
+        .bindPopup("📍 Your Location");
 
       // Cab starts ~1.5km away
       const cabStartLat = userLat + 0.013;
@@ -418,7 +422,7 @@
           font-size:32px;
           filter:drop-shadow(0 4px 12px rgba(234,179,8,0.8));
           animation:cab-wiggle 1s ease-in-out infinite alternate;
-        ">ðŸš–</div>
+        ">🚖</div>
         <style>
           @keyframes cab-wiggle {
             from { transform: rotate(-5deg); }
@@ -430,7 +434,7 @@
       });
       cabMarker = L.marker([cabStartLat, cabStartLng], { icon: cabIcon })
         .addTo(mapInstance)
-        .bindPopup("ðŸš– Your Cab");
+        .bindPopup("🚖 Your Cab");
 
       // Draw route and animate cab
       fetch(`https://router.project-osrm.org/route/v1/driving/${cabStartLng},${cabStartLat};${userLng},${userLat}?overview=full&geometries=geojson`)
@@ -512,7 +516,7 @@
       document.getElementById("distValue").innerText = "0.0";
       document.getElementById("distCard").innerText = "0.0";
       document.getElementById("statusLabel").innerText = "Arrived";
-      document.getElementById("statusText").innerText = "Cab has arrived at your location! ðŸŽ‰";
+      document.getElementById("statusText").innerText = "Cab has arrived at your location! 🎉";
       document.getElementById("pageTitle").innerText = "Cab has Arrived!";
       document.getElementById("arrivedOverlay").classList.add("show");
       
@@ -520,8 +524,8 @@
       socket.emit("cab_arrived", { requestId: currentRequestId, userPhone: uPhone });
     }
 
-    // â”€â”€ Socket event handling â”€â”€
-    const socket = io("http://localhost:5001");
+    // —— Socket event handling ——
+    const socket = io(BACKEND_URL);
 
     socket.on("cab_arrived", (data) => {
       if (data.requestId === currentRequestId) onCabArrived();
@@ -530,18 +534,18 @@
     socket.on("cab_pickup", (data) => {
       if (data.requestId === currentRequestId) {
         document.getElementById("statusLabel").innerText = "In Transit";
-        document.getElementById("statusText").innerText = "You are in the cab heading to a safe point ðŸš—";
+        document.getElementById("statusText").innerText = "You are in the cab heading to a safe point 🚘";
         document.getElementById("statusLabel").className = "text-xs font-black uppercase tracking-widest text-blue-400";
         document.querySelector('.status-dot').style.background = "#3b82f6";
         document.querySelector('.status-dot').style.boxShadow = "0 0 10px #3b82f6";
-        if(cabMarker) cabMarker.bindPopup("ðŸš— In Transit").openPopup();
+        if(cabMarker) cabMarker.bindPopup("🚘 In Transit").openPopup();
       }
     });
 
     socket.on("cab_dropoff", (data) => {
       if (data.requestId === currentRequestId) {
         document.getElementById("statusLabel").innerText = "Dropped Off";
-        document.getElementById("statusText").innerText = "You have safely arrived at your destination ðŸ ";
+        document.getElementById("statusText").innerText = "You have safely arrived at your destination 🏡";
         document.getElementById("statusLabel").className = "text-xs font-black uppercase tracking-widest text-green-400";
         document.querySelector('.status-dot').style.background = "#22c55e";
         document.querySelector('.status-dot').style.boxShadow = "0 0 10px #22c55e";
@@ -553,7 +557,7 @@
       }
     });
 
-    // â”€â”€ User Journey Controls â”€â”€
+    // ── User Journey Controls ──
     function setDropLocation() {
       const loc = document.getElementById("dropLocationInput").value;
       if (!loc) return alert("Please enter a drop location");
@@ -565,14 +569,14 @@
       socket.emit("cab_pickup", { requestId: currentRequestId, userPhone: uPhone });
       document.getElementById("btnPickup").style.opacity = "0.5";
       document.getElementById("btnPickup").disabled = true;
-      document.getElementById("btnPickup").innerText = "âœ… Picked Up";
+      document.getElementById("btnPickup").innerText = "✅ Picked Up";
     }
 
     function userNotifyCabDropoff() {
       socket.emit("cab_dropoff", { requestId: currentRequestId, userPhone: uPhone });
       document.getElementById("btnDropoff").style.opacity = "0.5";
       document.getElementById("btnDropoff").disabled = true;
-      document.getElementById("btnDropoff").innerText = "âœ… Dropped Off";
+      document.getElementById("btnDropoff").innerText = "✅ Dropped Off";
       alert("Trip completed securely.");
     }
 

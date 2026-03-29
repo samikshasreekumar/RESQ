@@ -97,6 +97,10 @@ app.use('/api/vehicles', require('./routes/vehicles'));
 app.use('/api/user', require('./routes/user'));
 app.use('/api/requests', require('./routes/requests'));
 
+app.get('/', (req, res) => {
+  res.send('RESQ Backend API is running... 🚀');
+});
+
 app.get('/api/mechanics/nearest', serviceController.findNearestMechanics);
 
 // Cabs API

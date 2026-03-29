@@ -174,7 +174,12 @@
       window.location.href = "admin_login.html";
     }
 
-    const BACKEND_URL = 'http://localhost:5001/api/admin';
+    // Dynamic Backend URL Detection
+    const BACKEND_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5001'
+      : 'https://resq-production-4525.up.railway.app';
+
+    const BACKEND_URL = `${BACKEND_BASE}/api/admin`;
 
     // Helper to get initials
     function getInitials(name) {
@@ -265,10 +270,10 @@
               
               <!-- Documents List -->
               <div class="flex items-center pr-4">
-                <a href="http://localhost:5001/${mech.idDoc}" target="_blank" title="View ID" class="doc-thumbnail">
+                <a href="${BACKEND_BASE}/${mech.idDoc}" target="_blank" title="View ID" class="doc-thumbnail">
                    <img src="${defaultDocPic}" alt="ID Doc" class="w-6 h-6 opacity-30">
                 </a>
-                <a href="http://localhost:5001/${mech.certDoc}" target="_blank" title="View Certificate" class="doc-thumbnail -ml-3">
+                <a href="${BACKEND_BASE}/${mech.certDoc}" target="_blank" title="View Certificate" class="doc-thumbnail -ml-3">
                    <img src="${defaultDocPic}" alt="Certificate" class="w-6 h-6 opacity-30">
                 </a>
               </div>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -40,22 +40,27 @@
       box-shadow: 0 0 40px rgba(242, 127, 13, 0.4);
     }
   </style>
-  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 
 <body class="bg-background-light dark:bg-dash-dark font-display text-white min-h-screen">
 
-  <!-- ðŸ”’ AUTH GUARD -->
+  <!-- 🔐 AUTH GUARD -->
   <script>
-      (async () => {
-        const phone = localStorage.getItem("u_phone");
-        const role = localStorage.getItem("u_role");
-        if (!phone || role !== "user") { window.location.href = "index.html"; return; }
-        try {
-          const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
-          if (!res.ok) { localStorage.removeItem("u_phone"); localStorage.removeItem("u_role"); window.location.href = "index.html"; }
-        } catch (e) { /* Fail open */ }
-      })();
+    (async () => {
+      const phone = localStorage.getItem("u_phone");
+      const role = localStorage.getItem("u_role");
+      if (!phone || role !== "user") { window.location.href = "index.html"; return; }
+      
+      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
+        if (!res.ok) { localStorage.removeItem("u_phone"); localStorage.removeItem("u_role"); window.location.href = "index.html"; }
+      } catch (e) { /* Fail open */ }
+    })();
   </script>
 
   <div class="flex h-screen overflow-hidden">
@@ -113,7 +118,7 @@
     <main class="flex-1 overflow-y-auto p-8">
       <div class="max-w-4xl mx-auto">
 
-        <!-- ðŸ”” ONGOING SERVICE BANNER -->
+        <!-- 🔔 ONGOING SERVICE BANNER -->
         <div id="activeRequestBanner"
           class="hidden mb-12 bg-orange-500/10 border border-orange-500/30 p-6 rounded-3xl flex justify-between items-center animate-pulse">
           <div class="flex items-center gap-4">
@@ -136,7 +141,7 @@
           <h1 class="text-5xl font-black text-slate-900 dark:text-white">How can we help you?</h1>
         </header>
 
-        <!-- ðŸš— VEHICLE SECTION -->
+        <!-- 🚗 VEHICLE SECTION -->
         <div id="vehicleSection" class="mb-16">
           <h3 class="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900 dark:text-white">
             <span
@@ -160,7 +165,7 @@
           </div>
         </div>
 
-        <!-- ðŸ”§ ISSUE TYPES -->
+        <!-- 🔧 ISSUE TYPES -->
         <div id="issueSection" class="opacity-30 pointer-events-none transition-all duration-700 mb-12 translate-y-4">
           <h3 class="text-xl font-bold mb-8 flex items-center gap-3 text-slate-900 dark:text-white">
             <span
@@ -168,7 +173,7 @@
             Nature of the Emergency
           </h3>
 
-          <!-- ðŸš¨ EMERGENCY BUTTON -->
+          <!-- 🚨 EMERGENCY BUTTON -->
           <div class="text-center mb-16 relative">
             <div class="absolute inset-0 bg-primary/20 blur-[100px] rounded-full"></div>
             <button id="emergencyBtn" onclick="requestHelp('Emergency Breakdown')"
@@ -185,28 +190,28 @@
               class="p-8 bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-3xl hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center gap-4 group">
               <div
                 class="size-16 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-3xl group-hover:bg-primary group-hover:text-white transition-all">
-                ðŸ›ž</div>
+                🛞</div>
               <span class="font-bold text-sm text-slate-900 dark:text-white">Flat Tyre</span>
             </button>
             <button onclick="requestHelp('Battery Issue')"
               class="p-8 bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-3xl hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center gap-4 group">
               <div
                 class="size-16 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-3xl group-hover:bg-primary group-hover:text-white transition-all">
-                ðŸ”‹</div>
+                🔋</div>
               <span class="font-bold text-sm text-slate-900 dark:text-white">Battery</span>
             </button>
             <button onclick="requestHelp('Engine Problem')"
               class="p-8 bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-3xl hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center gap-4 group">
               <div
                 class="size-16 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-3xl group-hover:bg-primary group-hover:text-white transition-all">
-                âš™ï¸</div>
+                ⚙️</div>
               <span class="font-bold text-sm text-slate-900 dark:text-white text-center leading-tight">Engine</span>
             </button>
             <button onclick="requestHelp('Out of Fuel')"
               class="p-8 bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-3xl hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center gap-4 group">
               <div
                 class="size-16 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-3xl group-hover:bg-primary group-hover:text-white transition-all">
-                â›½</div>
+                ⛽</div>
               <span class="font-bold text-sm text-slate-900 dark:text-white">Fuel</span>
             </button>
           </div>
@@ -218,17 +223,20 @@
   </div>
 
   <script>
-    const phone = localStorage.getItem("phone");
-
-    /* ðŸ‘¤ LOAD USER PROFILE */
+    /* 👤 LOAD USER PROFILE */
     async function loadProfile() {
+      const phone = localStorage.getItem("u_phone");
+      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
+
       try {
-        const response = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+        const response = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
         if (response.ok) {
           const user = await response.json();
           document.getElementById("userName").innerText = user.name || "User";
           if (user.profilePhoto) {
-            const photoUrl = `http://localhost:5001/${user.profilePhoto.replace(/\\/g, '/')}`;
+            const photoUrl = `${BACKEND_URL}/${user.profilePhoto.replace(/\\/g, '/')}`;
             document.getElementById("sideProfilePhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
           }
         }
@@ -236,14 +244,19 @@
     }
     loadProfile();
 
-    /* ðŸš— LOAD VEHICLES */
+    /* 🚗 LOAD VEHICLES */
     let selectedVehicle = null;
 
     async function loadVehicles() {
+      const phone = localStorage.getItem("u_phone");
+      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
+
       const list = document.getElementById("vehicleList");
 
       try {
-        const response = await fetch(`http://localhost:5001/api/vehicles/${phone}`);
+        const response = await fetch(`${BACKEND_URL}/api/vehicles/${phone}`);
         if (response.ok) {
           const vehicles = await response.json();
 
@@ -267,7 +280,7 @@
               </div>
               <div class="flex-1">
                 <p class="font-black text-lg text-slate-900 dark:text-white">${v.model}</p>
-                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">${v.brand || 'Vehicle'} â€¢ ${v.number}</p>
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">${v.brand || 'Vehicle'} — ${v.number}</p>
               </div>
               <div class="selection-dot size-6 rounded-full border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center group-[.active]:border-primary transition-all">
                  <div class="dot size-3 rounded-full bg-primary opacity-0 scale-0 group-[.active]:opacity-100 group-[.active]:scale-100 transition-all"></div>
@@ -298,13 +311,17 @@
     }
     loadVehicles();
 
-    /* ðŸ”” CHECK ACTIVE REQUEST */
+    /* 🔔 CHECK ACTIVE REQUEST */
     async function checkActiveRequest() {
       const requestId = localStorage.getItem("currentRequestId");
       if (!requestId) return;
 
+      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
+
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${requestId}`);
+        const response = await fetch(`${BACKEND_URL}/api/requests/${requestId}`);
         if (response.ok) {
           const data = await response.json();
           if (['Pending', 'Approved', 'Arrived', 'Work Started'].includes(data.request.status)) {
@@ -319,21 +336,23 @@
     }
     checkActiveRequest();
 
-    /* ðŸš¨ REQUEST HELP */
+    /* 🚨 REQUEST HELP */
     function requestHelp(issue) {
       if (!issue || !selectedVehicle) return;
       localStorage.setItem("issueType", issue);
       window.location.href = "service.html";
     }
 
-    /* ðŸ”“ LOGOUT */
+    /* 🔒 LOGOUT */
     function logout() {
       localStorage.clear();
       window.location.href = "index.html";
     }
 
-    /* ðŸ”Œ REAL-TIME NOTIFICATIONS */
-    const socket = io("http://localhost:5001");
+    /* 🔌 REAL-TIME NOTIFICATIONS */
+    const socket = io(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+      ? "http://localhost:5001" 
+      : "https://resq-production-4525.up.railway.app");
 
     socket.on("request_status_updated", (data) => {
       const uPhone = localStorage.getItem("u_phone") || localStorage.getItem("phone");

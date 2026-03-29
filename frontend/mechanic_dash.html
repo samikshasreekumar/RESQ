@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mechanic Dashboard - RESQ Kerala</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <style>
@@ -19,7 +19,7 @@
 <body class="bg-[#221910] min-h-screen text-white p-6">
 
   <header class="mb-8 border-b border-white/10 pb-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-orange-500">RESQ â€“ Mechanic Dashboard</h1>
+    <h1 class="text-2xl font-bold text-orange-500">RESQ – Mechanic Dashboard</h1>
     <button onclick="logout()"
       class="px-5 py-2.5 bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white rounded-xl text-sm font-black transition flex items-center gap-2 border border-red-500/30 group">
       <span
@@ -59,7 +59,7 @@
   <!-- Active Work Section -->
   <div id="activeWorkContainer" class="hidden">
     <h2 id="activeWorkTitle" class="text-xl font-bold mb-4 flex items-center gap-2">
-      <span class="w-8 h-8 bg-green-500/20 text-green-500 rounded-lg flex items-center justify-center">ðŸ› ï¸</span>
+      <span class="w-8 h-8 bg-green-500/20 text-green-500 rounded-lg flex items-center justify-center">🛠️</span>
       Active Service Work
     </h2>
     <div id="activeWork" class="mb-8">
@@ -69,7 +69,7 @@
 
   <!-- Available Service Requests Section (Moved to Bottom) -->
   <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-    <span class="w-8 h-8 bg-orange-500/20 text-orange-500 rounded-lg flex items-center justify-center">ðŸ”§</span>
+    <span class="w-8 h-8 bg-orange-500/20 text-orange-500 rounded-lg flex items-center justify-center">🔧</span>
     Available Service Requests
   </h2>
   <div id="requestsList" class="space-y-4">
@@ -82,7 +82,7 @@
   <!-- Service History Section -->
   <div class="mt-12">
     <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-      <span class="w-8 h-8 bg-blue-500/20 text-blue-500 rounded-lg flex items-center justify-center">ðŸ“œ</span>
+      <span class="w-8 h-8 bg-blue-500/20 text-blue-500 rounded-lg flex items-center justify-center">📜</span>
       Service History & Feedback
     </h2>
     <div id="historyList" class="space-y-4">
@@ -92,26 +92,31 @@
     </div>
   </div>
 
-  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+
   <script>
+    // Dynamic Backend URL Detection
+    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5001'
+      : 'https://resq-production-4525.up.railway.app';
+
     const mechanicPhone = localStorage.getItem("m_phone") || localStorage.getItem("phone");
     const mechanicRole = localStorage.getItem("m_role") || localStorage.getItem("role");
     const requestsList = document.getElementById("requestsList");
 
-    // â”€â”€ SOCKET.IO FOR LIVE ALERTS â”€â”€
-    const socket = io("http://localhost:5001");
+    // ── SOCKET.IO FOR LIVE ALERTS ──
+    const socket = io(BACKEND_URL);
     // We listen to all cab events and show a toast if the userPhone matches our active request
     socket.on("cab_arrived", (data) => {
-      showToast(`ðŸš– Cab has arrived for Customer (${data.userPhone})`);
+      showToast(`🚕 Cab has arrived for Customer (${data.userPhone})`);
     });
     socket.on("cab_pickup", (data) => {
-      showToast(`ðŸš¶ Customer (${data.userPhone}) has been picked up`);
+      showToast(`🚶 Customer (${data.userPhone}) has been picked up`);
     });
     socket.on("cab_dropoff", (data) => {
-      showToast(`ðŸ  Customer (${data.userPhone}) safely dropped off`);
+      showToast(`🏠 Customer (${data.userPhone}) safely dropped off`);
     });
     socket.on("cab_arranged_by_user", (data) => {
-      showToast(`ðŸš• Customer successfully auto-booked a cab!`);
+      showToast(`🚕 Customer successfully auto-booked a cab!`);
       loadRequests();
     });
 
@@ -125,7 +130,7 @@
     // Step 2: Validate against backend that this phone is actually an APPROVED mechanic
     async function validateSession() {
       try {
-        const res = await fetch(`http://localhost:5001/api/auth/mechanic/profile/${mechanicPhone}`);
+        const res = await fetch(`${BACKEND_URL}/api/auth/mechanic/profile/${mechanicPhone}`);
         if (!res.ok) {
           // Phone not found or server error -> force re-login
           console.warn("Guard: Backend rejected phone. Redirecting to login.");
@@ -152,7 +157,7 @@
 
     async function loadProfile() {
       try {
-        const response = await fetch(`http://localhost:5001/api/auth/mechanic/profile/${mechanicPhone}`);
+        const response = await fetch(`${BACKEND_URL}/api/auth/mechanic/profile/${mechanicPhone}`);
         if (response.ok) {
           const mechanic = await response.json();
           currentMechanic = mechanic;
@@ -160,7 +165,7 @@
           document.getElementById("mechJobTitle").innerText = mechanic.jobTitle || "Mechanic";
           document.getElementById("mechId").innerText = "FULL ID: " + (mechanic.id ? mechanic.id.toUpperCase() : "N/A");
           if (mechanic.profilePhoto) {
-            document.getElementById("profileImg").src = `http://localhost:5001/${mechanic.profilePhoto.replace(/\\/g, '/')}`;
+            document.getElementById("profileImg").src = `${BACKEND_URL}/${mechanic.profilePhoto.replace(/\\/g, '/')}`;
           }
           document.getElementById("profileHeader").classList.remove("hidden");
         }
@@ -197,13 +202,13 @@
       }
 
       try {
-        const res = await fetch(`http://localhost:5001/api/auth/mechanic/profile/${mechanicPhone}`, {
+        const res = await fetch(`${BACKEND_URL}/api/auth/mechanic/profile/${mechanicPhone}`, {
           method: 'PUT',
           body: formData
         });
 
         if (res.ok) {
-          showToast("Profile updated successfully! âœ…");
+          showToast("Profile updated successfully! ✅");
           closeEditModal();
           loadProfile();
         } else {
@@ -218,7 +223,7 @@
     async function approveRequest(id) {
       if (!confirm("Are you sure you want to accept this request?")) return;
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${id}/approve`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${id}/approve`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mechanicPhone })
@@ -240,7 +245,7 @@
       if (!confirm("Are you sure you want to decline this request?")) return;
       try {
         console.log(`Attempting to decline request: ${id}`);
-        const response = await fetch(`http://localhost:5001/api/requests/${id}/decline`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${id}/decline`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -281,7 +286,7 @@
       if (!confirm("Are you sure you want to delete this request permanently?")) return;
       console.log("Delete button clicked for request ID:", id);
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${id}`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${id}`, {
           method: 'DELETE'
         });
 
@@ -319,7 +324,7 @@
 
     async function updateStatus(id, status) {
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${id}/status`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${id}/status`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status })
@@ -374,11 +379,11 @@
     async function loadRequests() {
       try {
         // Load all pending requests
-        const response = await fetch(`http://localhost:5001/api/requests/pending?mechanicPhone=${mechanicPhone}`);
+        const response = await fetch(`${BACKEND_URL}/api/requests/pending?mechanicPhone=${mechanicPhone}`);
         const requests = await response.json();
 
         // Also check if this mechanic has an active request (Approved, Arrived, Work Started)
-        const allRes = await fetch('http://localhost:5001/api/admin/requests');
+        const allRes = await fetch(`${BACKEND_URL}/api/admin/requests`);
         const allRequests = await allRes.json();
 
         const activeReq = allRequests.find(r =>
@@ -397,7 +402,7 @@
                 <div>
                   <h3 class="text-xl font-bold text-green-400">${activeReq.issueType}</h3>
                   <p class="text-sm text-gray-400">User: ${activeReq.userPhone}</p>
-                  ${activeReq.userAddress ? `<p class="text-xs text-orange-400 mt-1 font-medium italic">ðŸ“ ${activeReq.userAddress}</p>` : ''}
+                  ${activeReq.userAddress ? `<p class="text-xs text-orange-400 mt-1 font-medium italic">📍 ${activeReq.userAddress}</p>` : ''}
                   <p class="text-sm text-gray-400">Status: <span class="font-bold text-white uppercase">${activeReq.status}</span></p>
                 </div>
                 <div class="text-right">
@@ -428,7 +433,7 @@
 
                    <!-- Estimated Repair Time (hours/mins) -->
                    <div class="flex-1 min-w-[180px]">
-                      <label class="block text-[10px] uppercase text-gray-500 mb-1 font-black">â± Repair Duration (hours/mins)</label>
+                      <label class="block text-[10px] uppercase text-gray-500 mb-1 font-black">⏳ Repair Duration (hours/mins)</label>
                       <div class="flex gap-2">
                          <input type="text" id="estTimeInput" placeholder="e.g. 45 mins" value="${activeReq.estimatedTime || ''}" 
                            class="flex-1 bg-white/5 border-white/10 rounded-lg text-sm focus:ring-orange-500">
@@ -438,7 +443,7 @@
 
                    <!-- Repair Days -->
                    <div class="flex-1 min-w-[180px]">
-                      <label class="block text-[10px] uppercase text-gray-500 mb-1 font-black">ðŸ“… Estimated Repair Days</label>
+                      <label class="block text-[10px] uppercase text-gray-500 mb-1 font-black">📅 Estimated Repair Days</label>
                       <div class="flex gap-2">
                          <input type="number" id="repairDaysInput" placeholder="e.g. 2" min="0" value="${activeReq.repairDays || ''}" 
                            class="flex-1 bg-white/5 border-white/10 rounded-lg text-sm focus:ring-orange-500">
@@ -450,16 +455,16 @@
                    ${!activeReq.cabServiceEnabled ? `
                    <button onclick="openCabModal('${activeReq.id}')"
                      class="px-5 py-2.5 rounded-xl text-sm font-bold transition border bg-white/5 border-white/10 text-gray-400 hover:bg-emerald-500/10 hover:border-emerald-500 hover:text-emerald-400">
-                     ðŸš– Arrange Cab for User
+                     🚕 Arrange Cab for User
                    </button>` : `
                    <div class="flex flex-col gap-2 flex-1 min-w-[220px]">
                      <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
-                       <span class="text-lg">ðŸš–</span>
+                       <span class="text-lg">🚕</span>
                        <div>
                          <p class="text-[10px] font-black uppercase tracking-widest">Cab Arranged</p>
                          <p class="text-xs font-bold text-white">Driver: ${activeReq.cabDriverName || 'Driver'}</p>
                        </div>
-                       <button onclick="disableCab('${activeReq.id}')" class="ml-auto text-red-400 hover:text-red-300 text-xs font-bold" title="Cancel Cab">âœ•</button>
+                       <button onclick="disableCab('${activeReq.id}')" class="ml-auto text-red-400 hover:text-red-300 text-xs font-bold" title="Cancel Cab">✖</button>
                      </div>
                    </div>`}
 
@@ -533,7 +538,7 @@
     async function loadHistory() {
       try {
         console.log("Fetching history for:", mechanicPhone);
-        const response = await fetch(`http://localhost:5001/api/requests/history/${mechanicPhone}`);
+        const response = await fetch(`${BACKEND_URL}/api/requests/history/${mechanicPhone}`);
         if (!response.ok) {
           console.error("History fetch failed:", response.status);
           return;
@@ -558,7 +563,7 @@
               <div class="mt-4 p-4 bg-orange-500/5 border border-orange-500/20 rounded-lg">
                 <div class="flex items-center gap-2 mb-1">
                   <div class="flex text-yellow-500">
-                    ${'â˜…'.repeat(req.rating)}${'â˜†'.repeat(5 - req.rating)}
+                    ${'★'.repeat(req.rating)}${'☆'.repeat(5 - req.rating)}
                   </div>
                   <span class="text-xs font-bold text-orange-400 uppercase tracking-wider">User Feedback</span>
                 </div>
@@ -578,7 +583,7 @@
       const estimatedTime = document.getElementById("estTimeInput").value;
       if (!estimatedTime) return showToast("Please enter estimated time", true);
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${id}/estimated-time`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${id}/estimated-time`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ estimatedTime })
@@ -599,7 +604,7 @@
 
     async function loadCabDrivers(type = 'AC') {
       try {
-        const response = await fetch(`http://localhost:5001/api/cabs?type=${type}`);
+        const response = await fetch(`${BACKEND_URL}/api/cabs?type=${type}`);
         const drivers = await response.json();
         const select = document.getElementById("cabDriverSelect");
         if(drivers.length === 0) {
@@ -632,7 +637,7 @@
       }
 
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${currentCabReqId}/enable-cab`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${currentCabReqId}/enable-cab`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ enabled: true, cabDriverName: name, cabVehicleNumber: "N/A", cabETA: "N/A" })
@@ -653,7 +658,7 @@
     async function disableCab(id) {
       if (!confirm("Cancel cab service for this user?")) return;
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${id}/enable-cab`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${id}/enable-cab`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ enabled: false })
@@ -672,13 +677,13 @@
 
     function notifyCabArrived(requestId, userPhone) {
       if (!confirm("Confirm that the cab has physically arrived at the user's location?")) return;
-      const socket = io("http://localhost:5001");
+      const socket = io(BACKEND_URL);
       socket.emit("cab_arrived", { requestId, userPhone });
-      showToast("âœ… User has been notified â€” Cab Arrived!");
+      showToast("✅ User has been notified — Cab Arrived!");
       document.querySelectorAll("button").forEach(btn => {
         if (btn.innerText.includes("Cab Arrived")) {
           btn.disabled = true;
-          btn.innerText = "âœ… Cab Arrived â€” Notified";
+          btn.innerText = "✅ Cab Arrived — Notified";
           btn.style.opacity = "0.5";
         }
       });
@@ -686,29 +691,29 @@
 
     function notifyCabPickup(requestId, userPhone) {
       if (!confirm("Confirm that the customer has been picked up?")) return;
-      const socket = io("http://localhost:5001");
+      const socket = io(BACKEND_URL);
       socket.emit("cab_pickup", { requestId, userPhone });
-      showToast("ðŸš¶ User notified â€” Customer Picked Up!");
+      showToast("🚶 User notified — Customer Picked Up!");
     }
 
     function notifyCabDropoff(requestId, userPhone) {
       if (!confirm("Confirm that the customer has been dropped off at the destination?")) return;
-      const socket = io("http://localhost:5001");
+      const socket = io(BACKEND_URL);
       socket.emit("cab_dropoff", { requestId, userPhone });
-      showToast("ðŸ  User notified â€” Customer Dropped Off!");
+      showToast("🏠 User notified — Customer Dropped Off!");
     }
 
     async function saveRepairDays(id) {
       const days = document.getElementById("repairDaysInput").value;
       if (!days || isNaN(days)) return showToast("Please enter a valid number of days", true);
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${id}/estimated-time`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${id}/estimated-time`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ estimatedTime: document.getElementById("estTimeInput").value || "", repairDays: days })
         });
         if (response.ok) {
-          showToast(`ðŸ“… Repair duration set: ${days} day(s)`);
+          showToast(`📅 Repair duration set: ${days} day(s)`);
           loadRequests();
         } else {
           showToast("Failed to save repair days.", true);
@@ -741,7 +746,7 @@
 
       try {
         // Fix: Changed URL from 'nearby' to 'nearest' to match backend route
-        const res = await fetch(`http://localhost:5001/api/mechanics/nearest?lat=${currentReassignUserLoc.lat}&lng=${currentReassignUserLoc.lng}&serviceType=Breakdown`);
+        const res = await fetch(`${BACKEND_URL}/api/mechanics/nearest?lat=${currentReassignUserLoc.lat}&lng=${currentReassignUserLoc.lng}&serviceType=Breakdown`);
         const mechanics = await res.json();
 
         const list = document.getElementById("nearbyList");
@@ -767,7 +772,7 @@
                    </div>
                    <div>
                       <p class="font-bold text-white group-hover:text-orange-400 transition">${m.name}</p>
-                      <p class="text-[10px] text-gray-500 uppercase tracking-widest font-black">${m.distance} km â€¢ ${m.district}</p>
+                      <p class="text-[10px] text-gray-500 uppercase tracking-widest font-black">${m.distance} km — ${m.district}</p>
                    </div>
                 </div>
                 <button onclick="reassignTo('${m.phone}')" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded-lg text-xs font-black shadow-lg shadow-orange-600/20 active:scale-95 transition">ASSIGN</button>
@@ -789,7 +794,7 @@
       const reason = document.getElementById("failureReason").value;
 
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${currentReassignReqId}/reassign`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${currentReassignReqId}/reassign`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ failureReason: reason, newMechanicPhone: newPhone })
@@ -942,7 +947,7 @@
         <button onclick="closeCabModal()"
           class="flex-1 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-bold transition">Cancel</button>
         <button onclick="submitCabDetails()"
-          class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-bold transition shadow-lg shadow-emerald-600/20">âœ…
+          class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-bold transition shadow-lg shadow-emerald-600/20">✅
           Confirm Cab</button>
       </div>
     </div>

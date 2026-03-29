@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -91,7 +91,7 @@
       color: #fbbf24 !important;
     }
 
-    /* â”€â”€ CAB ARRIVAL POPUP â”€â”€ */
+    /* ── CAB ARRIVAL POPUP ── */
     #cabArrivalOverlay {
       position: fixed;
       inset: 0;
@@ -216,13 +216,13 @@
     .cab-close-btn:hover { background: rgba(16,185,129,0.25); transform: translateY(-2px); }
     .cab-close-btn:active { transform: scale(0.97); }
 
-    /* â”€â”€ Hide Scrollbar CSS â”€â”€ */
+    /* ── Hide Scrollbar CSS ── */
     .style-scrollbar::-webkit-scrollbar { width: 6px; }
     .style-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
     .style-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     .style-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
   </style>
-  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 
 <body class="bg-background-light dark:bg-dash-dark font-display text-slate-900 dark:text-white min-h-screen">
@@ -232,8 +232,13 @@
         const phone = localStorage.getItem("u_phone");
         const role = localStorage.getItem("u_role");
         if (!phone || role !== "user") { window.location.href = "index.html"; return; }
+
+        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:5001'
+          : 'https://resq-production-4525.up.railway.app';
+
         try {
-          const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+          const res = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
           if (!res.ok) { localStorage.removeItem("u_phone"); localStorage.removeItem("u_role"); window.location.href = "index.html"; }
         } catch (e) { /* Fail open */ }
       })();
@@ -302,7 +307,7 @@
             <span class="material-symbols-outlined text-emerald-500 text-3xl">local_taxi</span>
             <div>
               <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Cab Arranged</p>
-              <p id="cabDriverDisplay" class="text-sm font-bold text-white">Driver: â€”</p>
+              <p id="cabDriverDisplay" class="text-sm font-bold text-white">Driver: —</p>
             </div>
             <a href="cab_tracking.html"
               class="ml-auto px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/40 border border-yellow-500/40 text-yellow-400 text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-1.5">
@@ -341,7 +346,7 @@
               </div>
               <div id="repairTimeSeparator" class="hidden w-px h-12 bg-slate-200 dark:bg-slate-800"></div>
               <div id="repairDaysFloatContainer" class="hidden">
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">ðŸ“… Repair Days</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">📅 Repair Days</p>
                 <p class="text-2xl font-black text-blue-400"><span id="repairDaysFloat">--</span> <span class="text-sm">days</span></p>
               </div>
               <div id="repairDaysFloatSep" class="hidden w-px h-12 bg-slate-200 dark:bg-slate-800"></div>
@@ -382,7 +387,7 @@
 
           <!-- Repair Days Card -->
           <div id="repairDaysCard" class="hidden bg-blue-500/10 border border-blue-500/30 p-6 rounded-[28px]">
-            <p class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">ðŸ“… Estimated Repair Days</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">📅 Estimated Repair Days</p>
             <p class="text-3xl font-black text-white"><span id="repairDaysDisplay">--</span> <span class="text-sm text-blue-400">day(s)</span></p>
             <p class="text-xs text-slate-400 mt-2 mb-1">Your vehicle will be ready in approximately this many days.</p>
           </div>
@@ -390,15 +395,15 @@
           <!-- Book Cab Card -->
           <div id="userBookCabCard" class="hidden bg-blue-500/10 border border-blue-500/30 p-6 rounded-[28px] mt-2 text-center">
             <div class="size-16 bg-blue-600/20 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <span class="text-3xl">ðŸš•</span>
+              <span class="text-3xl">🚕</span>
             </div>
             <p id="userBookCabPromptText" class="text-xs font-bold text-white mb-4 px-2">Since the repair will take some time, would you like a safe ride home?</p>
             
             <div class="mb-4">
               <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-2 font-black text-left">Select Travel Mode</label>
               <select id="userCabModeSelect" class="w-full bg-black/40 border border-blue-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition style-scrollbar" style="color-scheme: dark;">
-                <option value="AC">ðŸ§Š AC Cab (Premium)</option>
-                <option value="NON_AC">ðŸ’¨ Non-AC Cab (Standard)</option>
+                <option value="AC">❄️ AC Cab (Premium)</option>
+                <option value="NON_AC">💨 Non-AC Cab (Standard)</option>
               </select>
             </div>
 
@@ -412,12 +417,12 @@
             <button onclick="openFraudModal()"
               class="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-red-500/30 bg-red-500/8 text-red-400 hover:bg-red-500/20 font-bold text-sm transition">
               <span class="material-symbols-outlined" style="font-size:18px;">report</span>
-              ðŸš¨ Report Fraud / Issue
+              🚨 Report Fraud / Issue
             </button>
             <button onclick="cancelServiceCompletely()"
               class="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-red-700/40 bg-red-900/20 text-red-500 hover:bg-red-700/30 font-bold text-sm transition">
               <span class="material-symbols-outlined" style="font-size:18px;">cancel</span>
-              âœ• Cancel This Service
+              ✖ Cancel This Service
             </button>
           </div>
         </div>
@@ -430,10 +435,10 @@
   <!-- CAB ARRIVAL OVERLAY -->
   <div id="cabArrivalOverlay">
     <div class="cab-card">
-      <div class="cab-icon-ring">ðŸš–</div>
+      <div class="cab-icon-ring">🚕</div>
       <div class="cab-tag">Cab Confirmed</div>
       <p class="cab-main-title">Your Cab is on the way!</p>
-      <p class="cab-driver-name" id="cabDriverNameDisplay">Driver: â€”</p>
+      <p class="cab-driver-name" id="cabDriverNameDisplay">Driver: —</p>
 
       <div class="cab-info-grid">
         <div class="cab-info-cell">
@@ -452,12 +457,12 @@
       </div>
 
       <button class="cab-close-btn" onclick="window.location.href='cab_tracking.html'">
-        ðŸš– &nbsp;Track Your Cab Live â†’
+        🚕 &nbsp;Track Your Cab Live →
       </button>
       <button onclick="document.getElementById('cabArrivalOverlay').classList.remove('show')"
         style="margin-top:10px;width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.08);
                background:transparent;color:rgba(255,255,255,0.3);font-size:13px;font-weight:600;cursor:pointer;">
-        Got it â€” I'll wait
+        Got it — I'll wait
       </button>
     </div>
   </div>
@@ -475,15 +480,15 @@
 
       <div class="flex justify-center gap-3 mb-10">
         <button onclick="setRating(1)" id="star-1"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">â˜…</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
         <button onclick="setRating(2)" id="star-2"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">â˜…</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
         <button onclick="setRating(3)" id="star-3"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">â˜…</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
         <button onclick="setRating(4)" id="star-4"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">â˜…</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
         <button onclick="setRating(5)" id="star-5"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">â˜…</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
       </div>
 
       <textarea id="feedbackText" placeholder="Share your experience (optional)..."
@@ -532,22 +537,27 @@
     const phone = localStorage.getItem("u_phone");
     let currentRating = 0;
 
+    // Dynamic Backend URL Detection
+    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5001'
+      : 'https://resq-production-4525.up.railway.app';
+
     async function init() {
       try {
         // Load User Profile
-        const uRes = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+        const uRes = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
         if (uRes.ok) {
           const user = await uRes.json();
           globalUserName = user.name || "User";
           document.getElementById("userName").innerText = globalUserName;
           if (user.profilePhoto) {
-            const photoUrl = `http://localhost:5001/${user.profilePhoto.replace(/\\/g, '/')}`;
+            const photoUrl = `${BACKEND_URL}/${user.profilePhoto.replace(/\\/g, '/')}`;
             document.getElementById("sideProfilePhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
           }
         }
 
         // Load Request Data
-        const rRes = await fetch(`http://localhost:5001/api/requests/${currentRequestId}`);
+        const rRes = await fetch(`${BACKEND_URL}/api/requests/${currentRequestId}`);
         if (!rRes.ok) {
            console.error("Backend error or request not found");
            return alert("Failed to load tracking data. Please refresh or check your dashboard.");
@@ -567,7 +577,7 @@
           phoneLink.setAttribute('data-phone', mech.phone);
           document.getElementById("callButtonText").innerText = `Call ${mech.phone}`;
           if (mech.profilePhoto) {
-            const photoUrl = `http://localhost:5001/${mech.profilePhoto.replace(/\\/g, '/')}`;
+            const photoUrl = `${BACKEND_URL}/${mech.profilePhoto.replace(/\\/g, '/')}`;
             document.getElementById("mechPhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
           }
         }
@@ -587,7 +597,7 @@
       L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
 
       // Mech Icon (Dynamic Mock)
-      const mechIcon = L.divIcon({ html: 'ðŸ› ï¸', className: 'text-2xl', iconSize: [40, 40] });
+      const mechIcon = L.divIcon({ html: '🛠️', className: 'text-2xl', iconSize: [40, 40] });
       const mLat = userLat + 0.01;
       const mLng = userLng + 0.01;
       const mechMarker = L.marker([mLat, mLng], { icon: mechIcon }).addTo(map);
@@ -638,7 +648,7 @@
       }, 10000);
 
       // SOCKET.IO INTEGRATION
-      const socket = io("http://localhost:5001");
+      const socket = io(BACKEND_URL);
       socket.on("request_status_updated", (data) => {
         if (data.requestId === currentRequestId) {
           console.log("Socket update received:", data.status);
@@ -647,24 +657,24 @@
         }
       });
 
-      // ðŸš– Cab Arrived â€” real-time notification from mechanic
+      // 🚕 Cab Arrived — real-time notification from mechanic
       socket.on("cab_arrived", (data) => {
         if (data.requestId === currentRequestId) {
           showCabArrivedAlert();
         }
       });
 
-      // ðŸš¶ Cab Picked up
+      // 🚶 Cab Picked up
       socket.on("cab_pickup", (data) => {
         if (data.requestId === currentRequestId) {
-          showLiveAlert("You are now in the cab. Safe travels! ðŸš—", "bg-blue-600");
+          showLiveAlert("You are now in the cab. Safe travels! 🚗", "bg-blue-600");
         }
       });
 
-      // ðŸ  Cab Dropped off
+      // 🏠 Cab Dropped off
       socket.on("cab_dropoff", (data) => {
         if (data.requestId === currentRequestId) {
-          showLiveAlert("You have been dropped off securely. ðŸ ", "bg-green-600");
+          showLiveAlert("You have been dropped off securely. 🏠", "bg-green-600");
           
           // Stop mechanic UI tracking
           document.getElementById("statusBadge").innerText = "AT SAFE LOCATION";
@@ -690,7 +700,7 @@
 
     async function updateUI() {
       try {
-        const res = await fetch(`http://localhost:5001/api/requests/${currentRequestId}`);
+        const res = await fetch(`${BACKEND_URL}/api/requests/${currentRequestId}`);
         const data = await res.json();
         const req = data.request;
         let status = req.status;
@@ -956,7 +966,7 @@
       document.getElementById("cabArrivalOverlay").classList.add("show");
     }
 
-    /* ðŸš– CAB ARRIVED ALERT â€” shown on user screen when mechanic confirms */
+    /* 🚍 CAB ARRIVED ALERT — shown on user screen when mechanic confirms */
     function showCabArrivedAlert() {
       // Remove existing if any
       const existing = document.getElementById("cabArrivedAlert");
@@ -1014,7 +1024,7 @@
             color:#000;font-size:15px;font-weight:900;letter-spacing:1px;
             transition:transform 0.15s;
           " onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-            OK â€” I'm heading to the cab!
+            OK — I'm heading to the cab!
           </button>
         </div>
 
