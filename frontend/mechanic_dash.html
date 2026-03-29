@@ -59,7 +59,9 @@
   <!-- Active Work Section -->
   <div id="activeWorkContainer" class="hidden">
     <h2 id="activeWorkTitle" class="text-xl font-bold mb-4 flex items-center gap-2">
-      <span class="w-8 h-8 bg-green-500/20 text-green-500 rounded-lg flex items-center justify-center">🛠️</span>
+      <span class="w-8 h-8 bg-green-500/20 text-green-500 rounded-lg flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg">build</span>
+      </span>
       Active Service Work
     </h2>
     <div id="activeWork" class="mb-8">
@@ -69,7 +71,9 @@
 
   <!-- Available Service Requests Section (Moved to Bottom) -->
   <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-    <span class="w-8 h-8 bg-orange-500/20 text-orange-500 rounded-lg flex items-center justify-center">🔧</span>
+    <span class="w-8 h-8 bg-orange-500/20 text-orange-500 rounded-lg flex items-center justify-center">
+      <span class="material-symbols-outlined text-lg">handyman</span>
+    </span>
     Available Service Requests
   </h2>
   <div id="requestsList" class="space-y-4">
@@ -82,7 +86,9 @@
   <!-- Service History Section -->
   <div class="mt-12">
     <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-      <span class="w-8 h-8 bg-blue-500/20 text-blue-500 rounded-lg flex items-center justify-center">📜</span>
+      <span class="w-8 h-8 bg-blue-500/20 text-blue-500 rounded-lg flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg">history</span>
+      </span>
       Service History & Feedback
     </h2>
     <div id="historyList" class="space-y-4">
@@ -104,7 +110,10 @@
     const requestsList = document.getElementById("requestsList");
 
     // ── SOCKET.IO FOR LIVE ALERTS ──
-    const socket = io(BACKEND_URL);
+    const socket = io(BACKEND_URL, {
+      transports: ['websocket', 'polling'],
+      withCredentials: true
+    });
     // We listen to all cab events and show a toast if the userPhone matches our active request
     socket.on("cab_arrived", (data) => {
       showToast(`🚕 Cab has arrived for Customer (${data.userPhone})`);
@@ -229,56 +238,37 @@
           body: JSON.stringify({ mechanicPhone })
         });
 
-        if (response.ok) {
-          showToast("Request Accepted! You can now manage it below.");
-          loadRequests();
-        } else {
-          showToast("Failed to accept request.", true);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to approve request');
         }
-      } catch (error) {
-        console.error("Error approving request:", error);
-        showToast("Network error while accepting request.", true);
+
+        alert("Request Accepted! ✅");
+        loadRequests();
+      } catch (err) {
+        console.error("Approve Error:", err);
+        alert("Error accepting request: " + err.message);
       }
     }
 
     async function rejectRequest(id) {
       if (!confirm("Are you sure you want to decline this request?")) return;
       try {
-        console.log(`Attempting to decline request: ${id}`);
         const response = await fetch(`${BACKEND_URL}/api/requests/${id}/decline`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
 
-        if (response.ok) {
-          showToast("Request declined successfully.");
-          // Immediately remove the card with animation
-          const card = document.getElementById(`request-${id}`);
-          if (card) {
-            card.style.transition = "all 0.5s ease";
-            card.style.opacity = "0";
-            card.style.transform = "translateY(-20px)";
-            setTimeout(() => {
-              card.remove();
-              if (requestsList.children.length === 0) {
-                requestsList.innerHTML = `
-                  <div class="p-8 text-center bg-white/5 rounded-xl border border-dashed border-white/10">
-                    <p class="text-gray-400">Waiting for incoming requests...</p>
-                  </div>`;
-              }
-            }, 500);
-          } else {
-            loadRequests();
-          }
-        } else {
-          const errStatus = response.status;
-          const errText = await response.text();
-          console.error(`Decline failed. Status: ${errStatus}, Text: ${errText}`);
-          showToast(`Failed to decline request. Status: ${errStatus}`, true);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to decline request');
         }
-      } catch (error) {
-        console.error("Error declining request:", error);
-        showToast("Network error while declining request.", true);
+
+        alert("Request declined successfully.");
+        loadRequests();
+      } catch (err) {
+        console.error("Decline Error:", err);
+        alert("Error declining request: " + err.message);
       }
     }
 
@@ -330,23 +320,16 @@
           body: JSON.stringify({ status })
         });
 
-        if (response.ok) {
-          if (status === 'Completed') {
-            // Immediate UI feedback
-            document.getElementById("activeWorkContainer").classList.add("hidden");
-            document.getElementById("activeWork").innerHTML = "";
-            showToast("Work marked as completed! Check history for feedback.");
-            loadHistory(); // Refresh history immediately to show the new completed entry
-          } else {
-            showToast(`Status updated to: ${status}`);
-          }
-          loadRequests();
-        } else {
-          showToast("Failed to update status.", true);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Failed to update status to ${status}`);
         }
-      } catch (error) {
-        console.error("Error updating status:", error);
-        showToast("Network error while updating status.", true);
+
+        alert(`Status updated to: ${status} ✅`);
+        loadRequests();
+      } catch (err) {
+        console.error("Status Update Error:", err);
+        alert("Error updating status: " + err.message);
       }
     }
 
@@ -455,7 +438,7 @@
                    ${!activeReq.cabServiceEnabled ? `
                    <button onclick="openCabModal('${activeReq.id}')"
                      class="px-5 py-2.5 rounded-xl text-sm font-bold transition border bg-white/5 border-white/10 text-gray-400 hover:bg-emerald-500/10 hover:border-emerald-500 hover:text-emerald-400">
-                     🚕 Arrange Cab for User
+                     <span class="material-symbols-outlined">local_taxi</span> Arrange Cab for User
                    </button>` : `
                    <div class="flex flex-col gap-2 flex-1 min-w-[220px]">
                      <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
@@ -563,7 +546,7 @@
               <div class="mt-4 p-4 bg-orange-500/5 border border-orange-500/20 rounded-lg">
                 <div class="flex items-center gap-2 mb-1">
                   <div class="flex text-yellow-500">
-                    ${'★'.repeat(req.rating)}${'☆'.repeat(5 - req.rating)}
+                    ${'&#9733;'.repeat(req.rating)}${'&#9734;'.repeat(5 - req.rating)}
                   </div>
                   <span class="text-xs font-bold text-orange-400 uppercase tracking-wider">User Feedback</span>
                 </div>
@@ -823,7 +806,7 @@
       }, 10000);
 
       // --- INCOMING CALL FEATURE ---
-      const socket = io("http://localhost:5001");
+      const socket = io(BACKEND_URL);
       socket.on("incoming_call", (data) => {
         if (data.mechanicPhone === mechanicPhone) {
           showCallRingingPopup(data.customerName, data.customerPhone);
@@ -915,7 +898,8 @@
     class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
     <div class="bg-[#2a1f14] border border-white/10 p-8 rounded-2xl max-w-md w-full shadow-2xl">
       <div class="flex items-center gap-4 mb-6">
-        <div class="size-12 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-2xl">ðŸš–
+        <div class="size-12 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
+          <span class="material-symbols-outlined text-3xl">local_taxi</span>
         </div>
         <div>
           <h2 class="text-xl font-bold text-emerald-400">Arrange Cab for User</h2>
@@ -947,7 +931,8 @@
         <button onclick="closeCabModal()"
           class="flex-1 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-bold transition">Cancel</button>
         <button onclick="submitCabDetails()"
-          class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-bold transition shadow-lg shadow-emerald-600/20">✅
+          class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-bold transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-lg">check_circle</span>
           Confirm Cab</button>
       </div>
     </div>

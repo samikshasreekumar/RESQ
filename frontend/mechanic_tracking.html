@@ -392,25 +392,7 @@
             <p class="text-xs text-slate-400 mt-2 mb-1">Your vehicle will be ready in approximately this many days.</p>
           </div>
 
-          <!-- Book Cab Card -->
-          <div id="userBookCabCard" class="hidden bg-blue-500/10 border border-blue-500/30 p-6 rounded-[28px] mt-2 text-center">
-            <div class="size-16 bg-blue-600/20 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <span class="text-3xl">🚕</span>
-            </div>
-            <p id="userBookCabPromptText" class="text-xs font-bold text-white mb-4 px-2">Since the repair will take some time, would you like a safe ride home?</p>
-            
-            <div class="mb-4">
-              <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-2 font-black text-left">Select Travel Mode</label>
-              <select id="userCabModeSelect" class="w-full bg-black/40 border border-blue-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition style-scrollbar" style="color-scheme: dark;">
-                <option value="AC">❄️ AC Cab (Premium)</option>
-                <option value="NON_AC">💨 Non-AC Cab (Standard)</option>
-              </select>
-            </div>
 
-            <button onclick="userAutoBookCab()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-2xl font-black text-sm transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
-              Auto-Book Verified Cab
-            </button>
-          </div>
 
           <!-- Action Buttons -->
           <div class="space-y-3">
@@ -435,7 +417,7 @@
   <!-- CAB ARRIVAL OVERLAY -->
   <div id="cabArrivalOverlay">
     <div class="cab-card">
-      <div class="cab-icon-ring">🚕</div>
+      <div class="cab-icon-ring"><span class="material-symbols-outlined text-4xl">local_taxi</span></div>
       <div class="cab-tag">Cab Confirmed</div>
       <p class="cab-main-title">Your Cab is on the way!</p>
       <p class="cab-driver-name" id="cabDriverNameDisplay">Driver: —</p>
@@ -457,7 +439,7 @@
       </div>
 
       <button class="cab-close-btn" onclick="window.location.href='cab_tracking.html'">
-        🚕 &nbsp;Track Your Cab Live →
+        <span class="material-symbols-outlined text-sm">local_taxi</span> &nbsp;Track Your Cab Live →
       </button>
       <button onclick="document.getElementById('cabArrivalOverlay').classList.remove('show')"
         style="margin-top:10px;width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.08);
@@ -480,15 +462,15 @@
 
       <div class="flex justify-center gap-3 mb-10">
         <button onclick="setRating(1)" id="star-1"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">&#9733;</button>
         <button onclick="setRating(2)" id="star-2"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">&#9733;</button>
         <button onclick="setRating(3)" id="star-3"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">&#9733;</button>
         <button onclick="setRating(4)" id="star-4"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">&#9733;</button>
         <button onclick="setRating(5)" id="star-5"
-          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">★</button>
+          class="text-5xl text-slate-200 dark:text-slate-800 hover:scale-125 transition-transform">&#9733;</button>
       </div>
 
       <textarea id="feedbackText" placeholder="Share your experience (optional)..."
@@ -759,19 +741,7 @@
           document.getElementById("repairDaysDisplay").innerText = req.repairDays;
         }
 
-        // Show the Book Cab option if repair takes >= 30 mins OR >= 1 day
-        const meetsCabCriteria = estMins >= 30 || repairDaysVal >= 1;
-        if (meetsCabCriteria && !req.cabServiceEnabled && !isDroppedOff) {
-           document.getElementById("userBookCabCard").classList.remove("hidden");
-           
-           if (repairDaysVal >= 1) {
-             document.getElementById("userBookCabPromptText").innerText = "Since your repair will take 1 or more days, would you like to securely book a ride home?";
-           } else {
-             document.getElementById("userBookCabPromptText").innerText = `Since the repair will take at least ${req.estimatedTime}, would you like a safe cab ride home?`;
-           }
-        } else {
-           document.getElementById("userBookCabCard").classList.add("hidden");
-        }
+
 
         if (status === 'Pending' && req.reassignedFrom) {
           window.location.href = "waiting.html";
@@ -815,18 +785,32 @@
 
     window.submitFeedback = async function () {
       const feedback = document.getElementById("feedbackText").value;
-      if (!currentRating) return alert("Select a rating");
+      if (!currentRating) return alert("Please select a rating (stars) before submitting.");
 
-      const res = await fetch(`http://localhost:5001/api/requests/${currentRequestId}/feedback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating: currentRating, feedback })
-      });
+      if (!currentRequestId) {
+        alert("Error: No active request ID found. Please refresh the page.");
+        return;
+      }
 
-      if (res.ok) {
-        localStorage.removeItem("currentRequestId");
-        localStorage.removeItem("requestStatus");
-        window.location.href = "user_dash.html";
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/requests/${currentRequestId}/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating: currentRating, feedback })
+        });
+
+        if (res.ok) {
+          alert("Feedback submitted! Thank you for using RESQ. ✅");
+          localStorage.removeItem("currentRequestId");
+          localStorage.removeItem("requestStatus");
+          window.location.href = "user_dash.html";
+        } else {
+          const data = await res.json();
+          throw new Error(data.message || "Failed to submit feedback");
+        }
+      } catch (err) {
+        console.error("Feedback Submission Error:", err);
+        alert("Error submitting feedback: " + err.message);
       }
     }
 
@@ -836,7 +820,7 @@
       // If we are on desktop, prevent default so it doesn't do nothing and complain, but we still want to notify mechanic
       const mechPhone = el.getAttribute('data-phone');
       
-      const socket = io("http://localhost:5001");
+      const socket = io(BACKEND_URL);
       socket.emit("initiate_call", { 
         mechanicPhone: mechPhone, 
         customerName: globalUserName, 
@@ -850,7 +834,7 @@
     async function cancelRequest() {
       if (!confirm("Are you sure you want to cancel this service?")) return;
       try {
-        const response = await fetch(`http://localhost:5001/api/requests/${currentRequestId}/status`, {
+        const response = await fetch(`${BACKEND_URL}/api/requests/${currentRequestId}/status`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'Cancelled' })
@@ -870,41 +854,7 @@
       }
     }
     
-    async function userAutoBookCab() {
-      try {
-        const mode = document.getElementById("userCabModeSelect").value;
-        const btn = document.querySelector("#userBookCabCard button");
-        btn.innerHTML = "Dispatching..."; btn.disabled = true;
 
-        // Fetch available driver matching the requested mode
-        const dRes = await fetch(`http://localhost:5001/api/cabs?type=${mode}`);
-        const drivers = await dRes.json();
-        
-        let driverName = "RESQ Auto-Dispatch";
-        if (drivers && drivers.length > 0) {
-           driverName = drivers[0].name + " (" + mode + ")";
-        }
-
-        const response = await fetch(`http://localhost:5001/api/requests/${currentRequestId}/enable-cab`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ enabled: true, cabDriverName: driverName, cabVehicleNumber: "N/A", cabETA: "N/A" })
-        });
-        if (response.ok) {
-          alert("Your cab has been successfully booked!");
-          updateUI();
-          const socket = io("http://localhost:5001");
-          socket.emit("cab_arranged_by_user", { requestId: currentRequestId });
-          // Open the cab tracking page directly since it was arranged
-          window.location.href = "cab_tracking.html";
-        } else {
-          alert("Failed to auto-book cab. Please try again or ask the professional.");
-          btn.innerHTML = "Auto-Book Verified Cab"; btn.disabled = false;
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
 
     function cancelServiceCompletely() {
       if (!confirm("DANGER: This will completely cancel your service request, stop the cab, and dismiss the professional. Are you absolutely sure?")) return;
@@ -923,7 +873,7 @@
       const reason = document.getElementById("fraudReason").value;
       if (!reason) return alert("Please select a reason");
       
-      const socket = io("http://localhost:5001");
+      const socket = io(BACKEND_URL);
       const mechanicPhoneStr = document.getElementById("phoneLink")?.getAttribute("data-phone") || "Unknown";
       const mechanicNameStr = document.getElementById("mechanicName").innerText || "Unknown Mechanic";
       const custNameStr = localStorage.getItem("username") || "Customer";
@@ -997,7 +947,7 @@
             margin:0 auto 20px;font-size:44px;
             box-shadow:0 0 40px rgba(234,179,8,0.3);
             animation:cab-bounce2 0.6s ease-in-out infinite alternate;
-          ">ðŸš–</div>
+          "><span class="material-symbols-outlined text-4xl">local_taxi</span></div>
 
           <div style="
             display:inline-flex;align-items:center;gap:6px;
@@ -1012,7 +962,7 @@
           </div>
 
           <p style="font-size:30px;font-weight:900;color:#fff;letter-spacing:-0.5px;margin-bottom:8px;">
-            Your Cab is Here! ðŸŽ‰
+            Your Cab is Here! &#127881;
           </p>
           <p style="font-size:14px;color:rgba(234,179,8,0.75);font-weight:600;letter-spacing:1px;margin-bottom:24px;">
             The driver is waiting at your location.<br>Please head to the cab now.

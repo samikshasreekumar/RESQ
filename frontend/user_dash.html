@@ -224,11 +224,12 @@
 
   <script>
     /* 👤 LOAD USER PROFILE */
+    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5001'
+      : 'https://resq-production-4525.up.railway.app';
+
     async function loadProfile() {
       const phone = localStorage.getItem("u_phone");
-      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5001'
-        : 'https://resq-production-4525.up.railway.app';
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
@@ -249,9 +250,6 @@
 
     async function loadVehicles() {
       const phone = localStorage.getItem("u_phone");
-      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5001'
-        : 'https://resq-production-4525.up.railway.app';
 
       const list = document.getElementById("vehicleList");
 
@@ -316,10 +314,6 @@
       const requestId = localStorage.getItem("currentRequestId");
       if (!requestId) return;
 
-      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5001'
-        : 'https://resq-production-4525.up.railway.app';
-
       try {
         const response = await fetch(`${BACKEND_URL}/api/requests/${requestId}`);
         if (response.ok) {
@@ -350,9 +344,7 @@
     }
 
     /* 🔌 REAL-TIME NOTIFICATIONS */
-    const socket = io(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-      ? "http://localhost:5001" 
-      : "https://resq-production-4525.up.railway.app");
+    const socket = io(BACKEND_URL);
 
     socket.on("request_status_updated", (data) => {
       const uPhone = localStorage.getItem("u_phone") || localStorage.getItem("phone");

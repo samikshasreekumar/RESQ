@@ -191,11 +191,11 @@
 
     <script>
         const phone = localStorage.getItem("phone");
+        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:5001'
+          : 'https://resq-production-4525.up.railway.app';
 
         async function loadProfile() {
-            const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-              ? 'http://localhost:5001'
-              : 'https://resq-production-4525.up.railway.app';
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
@@ -247,9 +247,6 @@
             }
 
             try {
-                const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-                  ? 'http://localhost:5001'
-                  : 'https://resq-production-4525.up.railway.app';
 
                 const response = await fetch(`${BACKEND_URL}/api/user/profile`, {
                     method: 'POST',

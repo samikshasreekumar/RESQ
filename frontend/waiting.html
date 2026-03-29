@@ -171,6 +171,10 @@
   <script>
     const phone = localStorage.getItem("phone");
     const currentRequestId = localStorage.getItem("currentRequestId");
+    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5001'
+      : 'https://resq-production-4525.up.railway.app';
+
     document.getElementById("reqId").innerText = currentRequestId || "Unknown";
 
     if (!currentRequestId) {
@@ -178,9 +182,6 @@
     }
 
     async function loadProfile() {
-      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5001'
-        : 'https://resq-production-4525.up.railway.app';
 
       try {
         const res = await fetch(`${BACKEND_URL}/api/user/profile/${phone}`);
@@ -203,9 +204,6 @@
     }
 
     async function checkStatus() {
-      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5001'
-        : 'https://resq-production-4525.up.railway.app';
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/requests/${currentRequestId}`);
@@ -255,9 +253,7 @@
     checkStatus();
 
     // SOCKET.IO INTEGRATION FOR LIVE UPDATES
-    const socket = io(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-      ? "http://localhost:5001" 
-      : "https://resq-production-4525.up.railway.app");
+    const socket = io(BACKEND_URL);
     const uPhone = localStorage.getItem("u_phone") || localStorage.getItem("phone");
 
     socket.on("connect", () => {

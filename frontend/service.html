@@ -269,13 +269,13 @@
     };
 
     const phone = localStorage.getItem("phone");
+    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5001'
+      : 'https://resq-production-4525.up.railway.app';
 
     /* 👤 LOAD USER DATA */
     async function loadUserData() {
       const phone = localStorage.getItem("phone");
-      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5001'
-        : 'https://resq-production-4525.up.railway.app';
 
       try {
         // Sidebar profile
@@ -365,10 +365,6 @@
     /* 🔍 FETCH MECHANICS */
     async function fetchMechanics() {
       if (!userLat || !userLng || !selectedService) return;
-
-      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5001'
-        : 'https://resq-production-4525.up.railway.app';
 
       try {
         let url = `${BACKEND_URL}/api/mechanics/nearest?lat=${userLat}&lng=${userLng}&serviceType=${selectedService}`;
@@ -467,9 +463,6 @@
       };
 
       try {
-        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-          ? 'http://localhost:5001'
-          : 'https://resq-production-4525.up.railway.app';
 
         const res = await fetch(`${BACKEND_URL}/api/requests`, {
           method: 'POST',

@@ -357,6 +357,9 @@
   <script>
     const currentRequestId = localStorage.getItem("currentRequestId");
     const uPhone = localStorage.getItem("u_phone") || localStorage.getItem("phone");
+    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001'
+        : 'https://resq-production-4525.up.railway.app';
 
     let etaMinutes = 10;
     let etaInterval = null;
@@ -367,10 +370,6 @@
     async function init() {
       // Guard: must be logged in as user
       if (!uPhone) { window.location.href = "index.html"; return; }
-
-      const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5001'
-        : 'https://resq-production-4525.up.railway.app';
 
       try {
         const rRes = await fetch(`${BACKEND_URL}/api/requests/${currentRequestId}`);

@@ -35,16 +35,15 @@
 
     <script>
         const phone = localStorage.getItem('phone');
+        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:5001'
+          : 'https://resq-production-4525.up.railway.app';
 
         async function checkStatus() {
             if (!phone) {
                 window.location.href = 'index.html';
                 return;
             }
-
-            const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-              ? 'http://localhost:5001'
-              : 'https://resq-production-4525.up.railway.app';
 
             try {
                 const res = await fetch(`${BACKEND_URL}/api/auth/status/${phone}`);
