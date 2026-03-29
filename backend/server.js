@@ -1,8 +1,10 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 const express = require('express');
 const http = require('http');
 const { Server } = require("socket.io");
 const cors = require('cors');
-const dotenv = require('dotenv');
 const sequelize = require('./config/database');
 const fs = require('fs');
 const path = require('path');

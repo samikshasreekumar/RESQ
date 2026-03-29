@@ -83,7 +83,7 @@
 
   <!-- Admin Login Floating Button (Hidden by default, shown on scroll) -->
   <a href="admin_login.html" id="floating-admin-btn"
-    class="fixed top-6 right-6 z-50 px-5 py-2.5 flex items-center gap-2 rounded-full border border-white/20 text-white font-semibold backdrop-blur-md bg-white/5 hover:bg-white/20 hover:border-white/50 transition-all duration-500 opacity-0 pointer-events-none translate-y-[-20px]">
+    class="fixed top-6 right-6 z-50 px-5 py-2.5 flex items-center gap-2 rounded-full border border-white/20 text-white font-semibold backdrop-blur-md bg-white/5 hover:bg-white/20 hover:border-white/50 transition-all duration-700 opacity-0 pointer-events-none translate-y-[-40px] scale-90">
     <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
@@ -94,7 +94,7 @@
 
   <!-- Mechanic Login Floating Button (Hidden by default, shown on scroll) -->
   <a href="#" id="floating-mechanic-btn" onclick="openMechanicLogin(event)"
-    class="fixed top-6 left-6 z-50 px-5 py-2.5 flex items-center gap-2 rounded-full border border-white/20 text-white font-semibold backdrop-blur-md bg-white/5 hover:bg-white/20 hover:border-white/50 transition-all duration-500 opacity-0 pointer-events-none translate-y-[-20px]">
+    class="fixed top-6 left-6 z-50 px-5 py-2.5 flex items-center gap-2 rounded-full border border-white/20 text-white font-semibold backdrop-blur-md bg-white/5 hover:bg-white/20 hover:border-white/50 transition-all duration-700 opacity-0 pointer-events-none translate-y-[-40px] scale-90">
     <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
@@ -168,18 +168,22 @@
       const mechanicBtn = document.getElementById("floating-mechanic-btn");
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          adminBtn.classList.remove("opacity-0", "pointer-events-none", "translate-y-[-20px]");
-          adminBtn.classList.add("opacity-100", "pointer-events-auto", "translate-y-0");
-          mechanicBtn.classList.remove("opacity-0", "pointer-events-none", "translate-y-[-20px]");
-          mechanicBtn.classList.add("opacity-100", "pointer-events-auto", "translate-y-0");
+          // Entering Login Section -> Pop In
+          adminBtn.classList.remove("opacity-0", "pointer-events-none", "translate-y-[-40px]", "scale-90");
+          adminBtn.classList.add("opacity-100", "pointer-events-auto", "translate-y-0", "scale-100");
+          
+          mechanicBtn.classList.remove("opacity-0", "pointer-events-none", "translate-y-[-40px]", "scale-90");
+          mechanicBtn.classList.add("opacity-100", "pointer-events-auto", "translate-y-0", "scale-100");
         } else {
-          adminBtn.classList.add("opacity-0", "pointer-events-none", "translate-y-[-20px]");
-          adminBtn.classList.remove("opacity-100", "pointer-events-auto", "translate-y-0");
-          mechanicBtn.classList.add("opacity-0", "pointer-events-none", "translate-y-[-20px]");
-          mechanicBtn.classList.remove("opacity-100", "pointer-events-auto", "translate-y-0");
+          // Leaving Login Section -> Hide
+          adminBtn.classList.add("opacity-0", "pointer-events-none", "translate-y-[-40px]", "scale-90");
+          adminBtn.classList.remove("opacity-100", "pointer-events-auto", "translate-y-0", "scale-100");
+          
+          mechanicBtn.classList.add("opacity-0", "pointer-events-none", "translate-y-[-40px]", "scale-90");
+          mechanicBtn.classList.remove("opacity-100", "pointer-events-auto", "translate-y-0", "scale-100");
         }
       });
-    }, { threshold: 0.3 }); // Trigger when 30% of the login section is visible
+    }, { threshold: 0.1, rootMargin: "0px" }); // Trigger earlier (10% visibility)
 
     observer.observe(document.getElementById("login-section"));
 
@@ -217,6 +221,11 @@
         sessionStorage.setItem("pending_test_otp", data.testOtp);
       }
       window.location.href = "otp.html";
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Socket connection error:", err);
+      // alert("Unable to connect to the emergency server. Please check your internet connection.");
     });
 
     socket.on("otp_error", (data) => {
