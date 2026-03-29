@@ -6,127 +6,167 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Monitoring - RESQ Kerala</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
     @keyframes flash-red {
       0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
       70% { box-shadow: 0 0 0 20px rgba(239,68,68,0); }
       100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
     }
     .fraud-alert { animation: flash-red 2s infinite; }
+    
+    .dashboard-card {
+      background: #27211b;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .dashboard-card:hover {
+      border-color: rgba(242, 127, 13, 0.2);
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-white min-h-screen p-8">
+<body class="bg-[#181411] text-slate-100 min-h-screen p-8">
 
-  <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 border-b border-white/10 pb-6">
-    <div>
-      <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Admin Monitoring Dashboard</h1>
-      <p class="text-sm text-slate-500 font-medium">System Overview & Management</p>
-    </div>
-    <div class="flex flex-wrap items-center gap-4">
-      <a href="admin_mechanic_approval.html"
-        class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-orange-600/20 transition flex items-center gap-2">
-        <span class="material-symbols-outlined">how_to_reg</span>
-        Mechanic Approvals
-      </a>
-      <button onclick="toggleMechanicsTable()"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-600/20 transition flex items-center gap-2">
-        <span class="material-symbols-outlined">group</span>
-        Manage Mechanics
-      </button>
-      <div class="h-10 w-px bg-white/10 mx-2 hidden md:block"></div>
-      <nav class="flex items-center gap-4">
-        <a href="admin_history.html"
-          class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-white px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-white/5 hover:bg-primary transition font-bold group">
-          <span class="material-symbols-outlined text-lg">history</span>
-          History
+  <div class="max-w-[1400px] mx-auto">
+
+    <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 border-b border-white/5 pb-8">
+      <div>
+        <h1 class="text-4xl font-black tracking-tight text-white mb-1">Admin Monitoring</h1>
+        <p class="text-sm text-slate-400 font-medium tracking-wide">SYSTEM OVERVIEW • KERALA STATE</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="admin_mechanic_approval.html"
+          class="bg-[#f27f0d] hover:scale-105 text-white px-8 py-3 rounded-full font-extrabold shadow-[0_0_20px_rgba(242,127,13,0.3)] transition flex items-center gap-2 text-sm uppercase tracking-wider">
+          <span class="material-symbols-outlined text-lg">how_to_reg</span>
+          Approvals
         </a>
-        <button onclick="logout()"
-          class="flex items-center gap-2 text-red-500 hover:text-white px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-600 border border-red-500/20 transition font-black group">
-          <span
-            class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">logout</span>
-          LOGOUT
+        <button onclick="toggleMechanicsTable()"
+          class="bg-white/5 hover:bg-white/10 text-white px-8 py-3 rounded-full font-extrabold border border-white/10 transition flex items-center gap-2 text-sm uppercase tracking-wider">
+          <span class="material-symbols-outlined text-lg">group</span>
+          Mechanics
         </button>
-      </nav>
+        <div class="h-10 w-px bg-white/10 mx-2 hidden md:block"></div>
+        <nav class="flex items-center gap-4">
+          <a href="admin_history.html"
+            class="flex items-center gap-2 text-slate-400 hover:text-white px-5 py-3 rounded-full bg-white/5 hover:bg-white/10 transition font-bold text-sm uppercase">
+            <span class="material-symbols-outlined text-lg">history</span>
+            Log
+          </a>
+          <button onclick="logout()"
+            class="flex items-center gap-2 text-red-500 hover:text-white px-5 py-3 rounded-full bg-red-500/10 hover:bg-red-600 transition font-black text-sm uppercase group">
+            <span class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">logout</span>
+            Exit
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- ===== STATS SECTION ===== -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+      <div class="dashboard-card p-8">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">Active Services</h2>
+          <span class="material-symbols-outlined text-yellow-500/50">bolt</span>
+        </div>
+        <p class="text-5xl font-black text-yellow-500 tabular-nums tracking-tighter">0</p>
+      </div>
+
+      <div class="dashboard-card p-8">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">Pending Requests</h2>
+          <span class="material-symbols-outlined text-blue-500/50">timer</span>
+        </div>
+        <p class="text-5xl font-black text-blue-500 tabular-nums tracking-tighter">0</p>
+      </div>
+
+      <div class="dashboard-card p-8">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">Completed</h2>
+          <span class="material-symbols-outlined text-emerald-500/50">check_circle</span>
+        </div>
+        <p class="text-5xl font-black text-emerald-500 tabular-nums tracking-tighter">0</p>
+      </div>
+
+    </div>
+
+    <!-- Temporary alert container -->
+    <div id="adminAlertContainer" class="fixed top-8 right-8 z-[100] flex flex-col gap-4"></div>
+
+    <!-- ===== REQUEST TABLE ===== -->
+    <div class="dashboard-card overflow-hidden">
+      <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+        <h3 class="font-black uppercase tracking-widest text-sm text-slate-400">Live Request Stream</h3>
+        <div class="flex items-center gap-2">
+          <span class="size-2 rounded-full bg-emerald-500 animate-ping"></span>
+          <span class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Live Monitoring</span>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left">
+          <thead>
+            <tr class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/5">
+              <th class="px-8 py-6">Request ID</th>
+              <th class="px-8 py-6">Location</th>
+              <th class="px-8 py-6">Customer</th>
+              <th class="px-8 py-6">Issue</th>
+              <th class="px-8 py-6">Status</th>
+              <th class="px-8 py-6">Time</th>
+            </tr>
+          </thead>
+          <tbody id="requestsBody" class="divide-y divide-white/[0.02]">
+            <tr>
+              <td colspan="6" class="text-center py-20 text-slate-500 font-bold tracking-wide italic">
+                No active requests in queue...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== MECHANICS TABLE ===== -->
+    <div id="mechanicsSection" class="hidden transition-all duration-500 mt-16">
+      <div class="mb-8 flex justify-between items-center">
+        <div>
+          <h2 class="text-3xl font-black text-white">Manage Professionals</h2>
+          <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Live Mechanic Fleet Intelligence</p>
+        </div>
+        <button onclick="toggleMechanicsTable()" class="size-12 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition border border-white/10 group">
+          <span class="material-symbols-outlined text-2xl group-hover:rotate-90 transition-transform">close</span>
+        </button>
+      </div>
+      <div class="dashboard-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left">
+            <thead>
+              <tr class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/5 bg-white/[0.02]">
+                <th class="px-8 py-6">Name & Title</th>
+                <th class="px-8 py-6">Phone</th>
+                <th class="px-8 py-6">District</th>
+                <th class="px-8 py-6">Identity Status</th>
+                <th class="px-8 py-6 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="mechanicsBody" class="divide-y divide-white/[0.02]">
+              <tr>
+                <td colspan="5" class="text-center py-20 text-slate-500 font-bold tracking-wide">Loading mechanic fleet data...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== STATS SECTION ===== -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-
-    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow">
-      <h2 class="text-lg font-semibold mb-2">Active Services</h2>
-      <p class="text-4xl font-bold text-yellow-500">0</p>
-    </div>
-
-    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow">
-      <h2 class="text-lg font-semibold mb-2">Pending Requests</h2>
-      <p class="text-4xl font-bold text-blue-500">0</p>
-    </div>
-
-    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow">
-      <h2 class="text-lg font-semibold mb-2">Completed Services</h2>
-      <p class="text-4xl font-bold text-green-500">0</p>
-    </div>
-
-  </div>
-
-
-  <!-- Temporary alert container for Fraud messages -->
-  <div id="adminAlertContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
-
-  <!-- ===== REQUEST TABLE ===== -->
-  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow overflow-hidden">
-    <table class="min-w-full text-left">
-      <thead class="bg-slate-200 dark:bg-slate-700 text-sm uppercase tracking-wider">
-        <tr>
-          <th class="px-6 py-4">ID</th>
-          <th class="px-6 py-4">Location</th>
-          <th class="px-6 py-4">User</th>
-          <th class="px-6 py-4">Issue</th>
-          <th class="px-6 py-4">Status</th>
-          <th class="px-6 py-4">Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td colspan="6" class="text-center py-6 text-gray-400">
-            No requests yet
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- ===== MECHANICS TABLE ===== -->
-  <div id="mechanicsSection" class="hidden transition-all duration-300">
-    <div class="mt-12 mb-6 flex justify-between items-center">
-      <h2 class="text-2xl font-bold">Manage Active Mechanics</h2>
-      <button onclick="toggleMechanicsTable()" class="text-slate-500 hover:text-white transition">
-        <span class="material-symbols-outlined text-3xl">close</span>
-      </button>
-    </div>
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow overflow-hidden mb-12">
-      <table class="min-w-full text-left">
-        <thead class="bg-slate-200 dark:bg-slate-700 text-sm uppercase tracking-wider">
-          <tr>
-            <th class="px-6 py-4">Name & Title</th>
-            <th class="px-6 py-4">Phone</th>
-            <th class="px-6 py-4">District</th>
-            <th class="px-6 py-4">Status</th>
-            <th class="px-6 py-4">Action</th>
-          </tr>
-        </thead>
-        <tbody id="mechanicsBody">
-          <tr>
-            <td colspan="5" class="text-center py-6 text-gray-400">Loading mechanics...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
   <!-- ===== SCRIPT ===== -->
   <script>
 
