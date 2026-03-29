@@ -103,6 +103,7 @@ app.get('/', (req, res) => {
 
 app.get('/api/mechanics/nearest', serviceController.findNearestMechanics);
 
+
 // ⚠️ TEMPORARY MOJIBAKE CLEANUP ROUTE
 app.get('/api/admin/system/clean-mojibake', async (req, res) => {
   try {
@@ -152,7 +153,6 @@ app.get('/api/admin/system/clean-mojibake', async (req, res) => {
   }
 });
 
-
 // Cabs API
 app.get('/api/cabs', async (req, res) => {
   try {
@@ -167,6 +167,9 @@ app.get('/api/cabs', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Socket.io Connection
 io.on('connection', (socket) => {
