@@ -749,8 +749,8 @@
           dot.className = "size-2 rounded-full bg-yellow-500 animate-pulse";
           container.className = "flex items-center gap-2 self-start bg-yellow-500/10 px-4 py-2 rounded-2xl border border-yellow-500/20";
         }
-        else if (status === 'Completed') {
-          // Automated transition to feedback
+        // Automated transition to feedback - ALWAYS CHECK ORIGINAL REQ STATUS
+        if (req.status === 'Completed') {
           const feedbackOverlay = document.getElementById("feedbackOverlay");
           if (feedbackOverlay.classList.contains("hidden")) {
             feedbackOverlay.classList.remove("hidden");
@@ -763,6 +763,26 @@
           document.getElementById("statusBadge").innerText = "COMPLETED";
           document.getElementById("statusBadge").className = "text-[10px] font-black uppercase tracking-widest text-emerald-500";
           document.getElementById("statusDot").className = "size-2 rounded-full bg-emerald-500";
+        }
+
+        if (status === 'Pending' && req.reassignedFrom) {
+          window.location.href = "waiting.html";
+        }
+        else if (status === 'Arrived') {
+          document.getElementById("distanceCount").innerText = "0.0";
+          document.getElementById("eta").innerText = "0";
+          document.getElementById("mainMessage").innerText = "Professional has Arrived";
+        }
+        else if (status === 'Work Started') {
+          document.getElementById("mainMessage").innerText = "Repair in Progress";
+          const badge = document.getElementById("statusBadge");
+          const dot = document.getElementById("statusDot");
+          const container = document.getElementById("statusBadgeContainer");
+
+          badge.innerText = "Work Started";
+          badge.className = "text-[10px] font-black uppercase tracking-widest text-yellow-500";
+          dot.className = "size-2 rounded-full bg-yellow-500 animate-pulse";
+          container.className = "flex items-center gap-2 self-start bg-yellow-500/10 px-4 py-2 rounded-2xl border border-yellow-500/20";
         }
         else if (status === 'Rejected') {
           window.location.href = "declined.html";
