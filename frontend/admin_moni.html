@@ -6,257 +6,247 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Monitoring - RESQ Kerala</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
-    body {
-      font-family: 'Lexend', sans-serif;
-    }
-    @keyframes flash-red {
-      0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
-      70% { box-shadow: 0 0 0 20px rgba(239,68,68,0); }
-      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-    }
-    .fraud-alert { animation: flash-red 2s infinite; }
+    body { font-family: 'Outfit', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #1a1614; }
+    ::-webkit-scrollbar-thumb { background: #332b28; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #ea580c; }
     
-    .dashboard-card {
-      background: #27211b;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 1.5rem;
-      transition: all 0.3s ease;
+    @keyframes pulse-orange {
+      0% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(234, 88, 12, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); }
     }
-    .dashboard-card:hover {
-      border-color: rgba(242, 127, 13, 0.2);
-      transform: translateY(-2px);
-    }
+    .live-dot { animation: pulse-orange 2s infinite; }
   </style>
 </head>
 
 <body class="bg-[#181411] text-slate-100 min-h-screen p-8">
 
-  <div class="max-w-[1400px] mx-auto">
-
+  <div class="max-w-7xl mx-auto">
+    <!-- ===== HEADER ===== -->
     <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 border-b border-white/5 pb-8">
       <div>
-        <h1 class="text-4xl font-black tracking-tight text-white mb-1">Admin Monitoring</h1>
-        <p class="text-sm text-slate-400 font-medium tracking-wide">SYSTEM OVERVIEW • KERALA STATE</p>
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-3 h-3 bg-orange-500 rounded-full live-dot"></div>
+          <h1 class="text-4xl font-black tracking-tight text-white uppercase">Control Center</h1>
+        </div>
+        <p class="text-sm text-slate-500 font-medium tracking-widest uppercase">Real-Time System Activity & Intelligence</p>
       </div>
-      <div class="flex flex-wrap items-center gap-4">
+      
+      <div class="flex flex-wrap items-center gap-3">
         <a href="admin_mechanic_approval.html"
-          class="bg-[#f27f0d] hover:scale-105 text-white px-8 py-3 rounded-full font-extrabold shadow-[0_0_20px_rgba(242,127,13,0.3)] transition flex items-center gap-2 text-sm uppercase tracking-wider">
-          <span class="material-symbols-outlined text-lg">how_to_reg</span>
+          class="bg-[#221c18] hover:bg-orange-600 border border-white/5 text-white px-5 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 group">
+          <span class="material-symbols-outlined text-orange-500 group-hover:text-white transition">how_to_reg</span>
           Approvals
         </a>
         <button onclick="toggleMechanicsTable()"
-          class="bg-white/5 hover:bg-white/10 text-white px-8 py-3 rounded-full font-extrabold border border-white/10 transition flex items-center gap-2 text-sm uppercase tracking-wider">
-          <span class="material-symbols-outlined text-lg">group</span>
-          Mechanics
+          class="bg-[#221c18] hover:bg-blue-600 border border-white/5 text-white px-5 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 group">
+          <span class="material-symbols-outlined text-blue-500 group-hover:text-white transition">engineering</span>
+          Professionals
         </button>
-        <div class="h-10 w-px bg-white/10 mx-2 hidden md:block"></div>
-        <nav class="flex items-center gap-4">
+        <div class="h-8 w-px bg-white/10 mx-2 hidden md:block"></div>
+        <nav class="flex items-center gap-3">
           <a href="admin_history.html"
-            class="flex items-center gap-2 text-slate-400 hover:text-white px-5 py-3 rounded-full bg-white/5 hover:bg-white/10 transition font-bold text-sm uppercase">
-            <span class="material-symbols-outlined text-lg">history</span>
-            Log
+            class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition group" title="Full History">
+            <span class="material-symbols-outlined text-slate-400 group-hover:text-white">history</span>
           </a>
           <button onclick="logout()"
-            class="flex items-center gap-2 text-red-500 hover:text-white px-5 py-3 rounded-full bg-red-500/10 hover:bg-red-600 transition font-black text-sm uppercase group">
-            <span class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">logout</span>
-            Exit
+            class="flex items-center gap-2 text-red-500 hover:text-white px-5 py-2.5 rounded-xl bg-red-500/5 hover:bg-red-600 border border-red-500/10 transition-all font-black group">
+            <span class="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform">logout</span>
+            EXIT
           </button>
         </nav>
       </div>
     </div>
 
     <!-- ===== STATS SECTION ===== -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-
-      <div class="dashboard-card p-8">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">Active Services</h2>
-          <span class="material-symbols-outlined text-yellow-500/50">bolt</span>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="bg-[#1c1816] p-6 rounded-2xl border border-white/5 hover:border-orange-500/30 transition-all group">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-orange-500 bg-orange-500/10 p-2 rounded-lg">sensors</span>
+          <span class="text-[10px] font-black tracking-widest text-orange-500 uppercase">Active Now</span>
         </div>
-        <p class="text-5xl font-black text-yellow-500 tabular-nums tracking-tighter">0</p>
+        <p class="text-5xl font-black text-white group-hover:scale-105 transition-transform" id="statActive">0</p>
+        <p class="text-xs text-slate-500 mt-2 font-bold uppercase tracking-tighter">Running Services</p>
       </div>
 
-      <div class="dashboard-card p-8">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">Pending Requests</h2>
-          <span class="material-symbols-outlined text-blue-500/50">timer</span>
+      <div class="bg-[#1c1816] p-6 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-blue-500 bg-blue-500/10 p-2 rounded-lg">pending_actions</span>
+          <span class="text-[10px] font-black tracking-widest text-blue-500 uppercase">Incoming</span>
         </div>
-        <p class="text-5xl font-black text-blue-500 tabular-nums tracking-tighter">0</p>
+        <p class="text-5xl font-black text-white group-hover:scale-105 transition-transform" id="statPending">0</p>
+        <p class="text-xs text-slate-500 mt-2 font-bold uppercase tracking-tighter">Queue Requests</p>
       </div>
 
-      <div class="dashboard-card p-8">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">Completed</h2>
-          <span class="material-symbols-outlined text-emerald-500/50">check_circle</span>
+      <div class="bg-[#1c1816] p-6 rounded-2xl border border-white/5 hover:border-green-500/30 transition-all group">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-green-500 bg-green-500/10 p-2 rounded-lg">task_alt</span>
+          <span class="text-[10px] font-black tracking-widest text-green-500 uppercase">Total Done</span>
         </div>
-        <p class="text-5xl font-black text-emerald-500 tabular-nums tracking-tighter">0</p>
+        <p class="text-5xl font-black text-white group-hover:scale-105 transition-transform" id="statCompleted">0</p>
+        <p class="text-xs text-slate-500 mt-2 font-bold uppercase tracking-tighter">Resolved Issues</p>
       </div>
-
     </div>
 
-    <!-- Temporary alert container -->
-    <div id="adminAlertContainer" class="fixed top-8 right-8 z-[100] flex flex-col gap-4"></div>
+    <!-- Temporary alert container for Fraud messages -->
+    <div id="adminAlertContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-3"></div>
 
-    <!-- ===== REQUEST TABLE ===== -->
-    <div class="dashboard-card overflow-hidden">
-      <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-        <h3 class="font-black uppercase tracking-widest text-sm text-slate-400">Live Request Stream</h3>
+    <!-- ===== LOG CONSOLE ===== -->
+    <div class="bg-[#1c1816] rounded-3xl border border-white/5 overflow-hidden flex flex-col h-[600px] shadow-2xl relative">
+      <div class="bg-[#221c18] px-8 py-4 border-b border-white/5 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-orange-500">terminal</span>
+          <h2 class="text-sm font-black uppercase tracking-widest">System Activity Log</h2>
+        </div>
         <div class="flex items-center gap-2">
-          <span class="size-2 rounded-full bg-emerald-500 animate-ping"></span>
-          <span class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Live Monitoring</span>
+           <div class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-bold text-slate-400">AUTO-REFRESH ACTIVE</div>
         </div>
       </div>
-      <div class="overflow-x-auto">
+      
+      <div id="activityLog" class="flex-1 overflow-y-auto p-8 space-y-4 font-mono text-sm leading-relaxed">
+        <div class="text-slate-600 opacity-50 animate-pulse italic">Initializing log stream...</div>
+      </div>
+      
+      <div class="bg-[#221c18] px-8 py-3 border-t border-white/5 flex justify-between items-center text-[10px] font-bold text-slate-600">
+        <p>SYSTEM STATUS: OPERATIONAL</p>
+        <p id="lastUpdate">LAST UPDATED: NEVER</p>
+      </div>
+    </div>
+
+    <!-- ===== MECHANICS SECTION ===== -->
+    <div id="mechanicsSection" class="hidden mt-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
+      <div class="mb-6 flex justify-between items-center bg-[#1c1816] p-6 rounded-2xl border border-white/10">
+        <div>
+           <h2 class="text-2xl font-black text-white uppercase tracking-tight">Active Professionals</h2>
+           <p class="text-xs text-slate-500 font-bold tracking-widest uppercase">Verified System Mechanics</p>
+        </div>
+        <button onclick="toggleMechanicsTable()" class="text-slate-500 hover:text-white transition p-2 bg-white/5 rounded-xl">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <div class="bg-[#1c1816] rounded-3xl border border-white/5 overflow-hidden shadow-2xl mb-12">
         <table class="min-w-full text-left">
-          <thead>
-            <tr class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/5">
-              <th class="px-8 py-6">Request ID</th>
-              <th class="px-8 py-6">Location</th>
-              <th class="px-8 py-6">Customer</th>
-              <th class="px-8 py-6">Issue</th>
-              <th class="px-8 py-6">Status</th>
-              <th class="px-8 py-6">Time</th>
+          <thead class="bg-[#221c18] text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-white/5">
+            <tr>
+              <th class="px-8 py-5">Professional Name</th>
+              <th class="px-8 py-5">Contact</th>
+              <th class="px-8 py-5">Operating District</th>
+              <th class="px-8 py-5">System Role</th>
+              <th class="px-8 py-5">System Status</th>
+              <th class="px-8 py-5">Admin Control</th>
             </tr>
           </thead>
-          <tbody id="requestsBody" class="divide-y divide-white/[0.02]">
+          <tbody id="mechanicsBody">
             <tr>
-              <td colspan="6" class="text-center py-20 text-slate-500 font-bold tracking-wide italic">
-                No active requests in queue...
-              </td>
+              <td colspan="6" class="px-8 py-10 text-center text-slate-500 italic">Querying database...</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-
-    <!-- ===== MECHANICS TABLE ===== -->
-    <div id="mechanicsSection" class="hidden transition-all duration-500 mt-16">
-      <div class="mb-8 flex justify-between items-center">
-        <div>
-          <h2 class="text-3xl font-black text-white">Manage Professionals</h2>
-          <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Live Mechanic Fleet Intelligence</p>
-        </div>
-        <button onclick="toggleMechanicsTable()" class="size-12 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition border border-white/10 group">
-          <span class="material-symbols-outlined text-2xl group-hover:rotate-90 transition-transform">close</span>
-        </button>
-      </div>
-      <div class="dashboard-card overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-left">
-            <thead>
-              <tr class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/5 bg-white/[0.02]">
-                <th class="px-8 py-6">Name & Title</th>
-                <th class="px-8 py-6">Phone</th>
-                <th class="px-8 py-6">District</th>
-                <th class="px-8 py-6">Identity Status</th>
-                <th class="px-8 py-6 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody id="mechanicsBody" class="divide-y divide-white/[0.02]">
-              <tr>
-                <td colspan="5" class="text-center py-20 text-slate-500 font-bold tracking-wide">Loading mechanic fleet data...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </div>
 
-  <!-- ===== SCRIPT ===== -->
   <script>
+    // System Config
+    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+      ? 'http://localhost:5001' 
+      : 'https://resq-production-4525.up.railway.app';
+    const API_BASE = `${BACKEND_URL}/api/admin`;
 
     // Check Login
-    const adminUser = localStorage.getItem("adminUser");
-    if (!adminUser) {
-      window.location.href = "admin_login.html";
-    }
+    if (!localStorage.getItem("adminUser")) window.location.href = "admin_login.html";
 
     function logout() {
       localStorage.removeItem("adminUser");
       window.location.href = "admin_login.html";
     }
 
-    // Dynamic Backend URL Detection
-    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? 'http://localhost:5001'
-      : 'https://resq-production-4525.up.railway.app';
+    // ===== SYSTEM INTELLIGENCE =====
+    let lastRequestCount = 0;
+    let knownRequests = new Map();
 
-    const API_BASE = `${BACKEND_URL}/api/admin`;
-
-    // ===== GET DATA =====
     async function updateDashboard() {
       try {
-        // 1. Stats
+        // 1. Fetch Stats
         const statsRes = await fetch(`${API_BASE}/stats`);
         const stats = await statsRes.json();
+        
+        document.getElementById("statActive").innerText = stats.active || 0;
+        document.getElementById("statPending").innerText = stats.pending || 0;
+        document.getElementById("statCompleted").innerText = stats.completed || 0;
+        document.getElementById("lastUpdate").innerText = `LAST UPDATED: ${new Date().toLocaleTimeString().toUpperCase()}`;
 
-        document.querySelectorAll(".text-4xl")[0].innerText = stats.active || 0;
-        document.querySelectorAll(".text-4xl")[1].innerText = stats.pending || 0;
-        document.querySelectorAll(".text-4xl")[2].innerText = stats.completed || 0;
-
-        // 2. Requests Table
+        // 2. Fetch All Requests for Log Generation
         const reqRes = await fetch(`${API_BASE}/requests`);
         const requests = await reqRes.json();
-
-        renderTable(requests);
+        processActivityLogs(requests);
 
       } catch (error) {
-        console.error("Dashboard error:", error);
+        console.error("System pulse error:", error);
       }
     }
 
-    // ===== STATUS BADGE =====
-    function getStatusBadge(status) {
-      if (status === "Pending") return `<span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">Pending</span>`;
-      if (status === "Approved" || status === "Arrived" || status === "Work Started") return `<span class="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-xs font-bold">${status}</span>`;
-      if (status === "Completed") return `<span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold">Completed</span>`;
-      if (status === "Rejected") return `<span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">Rejected</span>`;
-      return status;
-    }
+    function processActivityLogs(requests) {
+      const logContainer = document.getElementById("activityLog");
+      let newEntries = [];
 
-    // ===== RENDER TABLE =====
-    function renderTable(requests) {
-      const tbody = document.getElementById("requestsBody");
-      tbody.innerHTML = "";
-
-      if (requests.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400">No requests yet</td></tr>`;
-        return;
-      }
+      requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       requests.forEach(req => {
-        const row = document.createElement("tr");
-        row.className = "border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition";
-        row.innerHTML = `
-      <td class="px-6 py-4 font-mono text-xs text-gray-500">${req.id.split('-')[0]}...</td>
-      <td class="px-6 py-4 text-sm">${req.district || 'Kerala'}</td>
-      <td class="px-6 py-4 text-sm font-semibold">${req.userPhone}</td>
-      <td class="px-6 py-4 text-sm">${req.issueType}</td>
-      <td class="px-6 py-4 text-sm">${getStatusBadge(req.status)}</td>
-      <td class="px-6 py-4 text-xs text-gray-400">${new Date(req.createdAt).toLocaleString()}</td>
-    `;
-        tbody.appendChild(row);
+        const shortId = req.id.split('-')[0].toUpperCase();
+        const oldState = knownRequests.get(req.id);
+        
+        // New Request
+        if (!oldState) {
+          newEntries.push({
+            time: req.createdAt,
+            color: 'text-blue-400',
+            msg: `<span class="text-blue-500 font-black">[NEW REQUEST]</span> ID: ${shortId} | User: ${req.userPhone} | Issue: ${req.issueType} | Location: ${req.district || 'Kerala'}`
+          });
+        } 
+        // Status Changed
+        else if (oldState.status !== req.status) {
+          let color = 'text-yellow-500';
+          let prefix = '[LOG UPDATE]';
+          if (req.status === 'Completed') { color = 'text-green-500'; prefix = '[SERVICE DONE]'; }
+          if (req.status === 'Rejected') { color = 'text-red-500'; prefix = '[ALERT REJECT]'; }
+          
+          newEntries.push({
+            time: new Date(), // Local time for update
+            color: color,
+            msg: `<span class="${color} font-black">${prefix}</span> ID: ${shortId} | User: ${req.userPhone} changed status from <span class="opacity-60 underline">${oldState.status}</span> to <span class="font-black">${req.status.toUpperCase()}</span>`
+          });
+        }
+        knownRequests.set(req.id, { status: req.status, updated: req.updatedAt });
       });
+
+      if (newEntries.length > 0) {
+        // If it's the first load, empty the spinner
+        if (logContainer.innerHTML.includes('Initializing')) logContainer.innerHTML = '';
+        
+        newEntries.sort((a, b) => new Date(a.time) - new Date(b.time)).forEach(entry => {
+          const div = document.createElement("div");
+          div.className = `${entry.color} pb-2 border-b border-white/5 animate-in slide-in-from-left duration-300`;
+          div.innerHTML = `<span class="text-slate-600 mr-2 text-[10px]">${new Date(entry.time).toLocaleTimeString()}</span> ${entry.msg}`;
+          logContainer.prepend(div);
+        });
+      }
     }
 
-    // ===== INIT =====
-    updateDashboard();
-    fetchMechanics();
-    setInterval(updateDashboard, 5000); // Live poll
-
+    // ===== MECHANICS CONTROL =====
     async function fetchMechanics() {
       try {
         const res = await fetch(`${API_BASE}/mechanics/all`);
         const mechanics = await res.json();
         renderMechanics(mechanics);
-      } catch (err) {
-        console.error("Error fetching mechanics:", err);
-      }
+      } catch (err) { console.error(err); }
     }
 
     function renderMechanics(mechanics) {
@@ -264,30 +254,33 @@
       tbody.innerHTML = "";
 
       if (mechanics.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400">No approved mechanics found</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="px-8 py-10 text-center text-slate-500">Inventory empty.</td></tr>`;
         return;
       }
 
       mechanics.forEach(m => {
-        const isSuspended = m.status === 'suspended';
+        const isS = m.status === 'suspended';
         const row = document.createElement("tr");
-        row.className = "border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition";
+        row.className = "border-b border-white/5 hover:bg-white/[0.02] transition-colors";
         row.innerHTML = `
-          <td class="px-6 py-4">
-            <div class="font-bold text-slate-900 dark:text-white">${m.name}</div>
-            <div class="text-xs text-orange-500">${m.jobTitle || 'Mechanic'}</div>
+          <td class="px-8 py-6">
+            <div class="font-black text-white text-base">${m.name}</div>
+            <div class="text-[10px] text-orange-500 font-black tracking-widest uppercase">${m.jobTitle || 'Specialist'}</div>
           </td>
-          <td class="px-6 py-4 text-sm">${m.phone}</td>
-          <td class="px-6 py-4 text-sm">${m.district}</td>
-          <td class="px-6 py-4 text-sm">
-            <span class="px-2 py-1 rounded-full text-xs font-bold ${isSuspended ? 'bg-red-500/20 text-red-500' : 'bg-green-500/20 text-green-500'}">
+          <td class="px-8 py-6 text-sm font-bold text-slate-400">${m.phone}</td>
+          <td class="px-8 py-6 text-sm font-bold text-slate-400">${m.district}</td>
+          <td class="px-8 py-6">
+             <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black text-blue-400 border border-blue-400/20 uppercase tracking-tighter">Field Agent</span>
+          </td>
+          <td class="px-8 py-6">
+            <span class="px-3 py-1 rounded-full text-[10px] font-black ${isS ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-green-500/10 text-green-500 border border-green-500/20'}">
               ${m.status.toUpperCase()}
             </span>
           </td>
-          <td class="px-6 py-4">
-            <button onclick="toggleSuspension('${m.phone}', ${isSuspended})" 
-              class="text-xs font-bold px-3 py-1 rounded transition ${isSuspended ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'}">
-              ${isSuspended ? 'Unsuspend' : 'Suspend'}
+          <td class="px-8 py-6">
+            <button onclick="toggleSuspension('${m.phone}', ${isS})" 
+              class="text-[10px] font-black px-4 py-2 rounded-xl transition-all ${isS ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/20'}">
+              ${isS ? 'UNSUSPEND' : 'RESTRICT'}
             </button>
           </td>
         `;
@@ -295,72 +288,50 @@
       });
     }
 
-    async function toggleSuspension(phone, isSuspended) {
-      const action = isSuspended ? 'unsuspend' : 'suspend';
-      if (!confirm(`Are you sure you want to ${action} this mechanic?`)) return;
-
+    async function toggleSuspension(phone, isS) {
+      const action = isS ? 'unsuspend' : 'suspend';
+      if (!confirm(`Are you sure you want to ${action} this professional?`)) return;
       try {
         const res = await fetch(`${API_BASE}/mechanics/${phone}/${action}`, { method: 'POST' });
-        if (res.ok) {
-          alert(`Mechanic ${action}ed successfully! ✅`);
-          fetchMechanics();
-        } else {
-          const data = await res.json();
-          throw new Error(data.message || `Failed to ${action} mechanic`);
-        }
-      } catch (err) {
-        console.error("Suspension Error:", err);
-        alert(`Error: ${err.message}`);
-      }
+        if (res.ok) fetchMechanics();
+      } catch (err) { console.error(err); }
     }
 
     function toggleMechanicsTable() {
-      const section = document.getElementById("mechanicsSection");
-      if (section.classList.contains("hidden")) {
-        section.classList.remove("hidden");
-        // Scroll to it smoothly
-        setTimeout(() => {
-          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      } else {
-        section.classList.add("hidden");
-      }
+      const s = document.getElementById("mechanicsSection");
+      s.classList.toggle("hidden");
+      if (!s.classList.contains("hidden")) s.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ===== SOCKET CONNECTION FOR REAL-TIME FRAUD ALERTS =====
-    const socket = io(BACKEND_URL, {
-      transports: ['websocket', 'polling'],
-      withCredentials: true
-    });
+    // ===== SOCKET CONNECTION =====
+    const socket = io(BACKEND_URL);
 
     socket.on("fraud_alert_admin", (data) => {
-      console.log("FRAUD ALERT RECEIVED:", data);
-      
       const alertBox = document.createElement("div");
-      alertBox.className = "bg-red-600 text-white p-4 rounded-xl shadow-2xl flex items-start gap-3 w-96 animate-in slide-in-from-right duration-500 border border-red-400";
+      alertBox.className = "bg-red-600 text-white p-5 rounded-2xl shadow-2xl flex items-start gap-4 w-[400px] animate-in slide-in-from-right duration-500 border border-white/10";
       alertBox.innerHTML = `
         <span class="material-symbols-outlined text-3xl">warning</span>
         <div class="flex-1">
-          <p class="font-black text-lg mb-1">Issue Reported!</p>
-          <p class="text-sm font-medium opacity-90 leading-relaxed">
-            Customer Number: <span class="font-bold">${data.userPhone}</span> <br>
-            Mechanic Number: <span class="font-bold">${data.mechanicId || 'Unknown'}</span> <br>
-            Message: <b>"${data.reason}"</b>
+          <p class="font-black text-lg mb-1 tracking-tight">ALERT: SECURITY BREACH</p>
+          <p class="text-xs font-bold opacity-80 leading-relaxed uppercase tracking-tighter">
+            User: ${data.userPhone} | Professional: ${data.mechanicId || 'NULL'} <br>
+            Payload: "${data.reason}"
           </p>
         </div>
-        <button onclick="this.parentElement.remove()" class="text-white hover:text-red-200 transition">
+        <button onclick="this.parentElement.remove()" class="text-white hover:opacity-50 transition">
           <span class="material-symbols-outlined">close</span>
         </button>
       `;
-
       document.getElementById("adminAlertContainer").appendChild(alertBox);
-
-      // Flash audio notification (optional beep)
-      // new Audio('data:audio/mp3;base64,...').play();
+      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+      audio.play().catch(() => {});
     });
 
+    // ===== INIT =====
+    updateDashboard();
+    fetchMechanics();
+    setInterval(updateDashboard, 5000);
+
   </script>
-
 </body>
-
 </html>
