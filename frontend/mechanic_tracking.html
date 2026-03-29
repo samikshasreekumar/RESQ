@@ -687,7 +687,7 @@
 
         document.getElementById("statusBadge").innerText = status.toUpperCase();
 
-        if (req.cabServiceEnabled && req.cabDriverName) {
+        if (req.cabServiceEnabled && req.cabDriverName && !isDroppedOff) {
           document.getElementById("cabInfoCard").classList.remove("hidden");
           document.getElementById("cabDriverDisplay").innerText = `Driver: ${req.cabDriverName}`;
           // Show the cab arrival popup the first time cab is enabled
@@ -801,6 +801,7 @@
           alert("Feedback submitted! Thank you for using RESQ. ✅");
           localStorage.removeItem("currentRequestId");
           localStorage.removeItem("requestStatus");
+          localStorage.removeItem(`cabDroppedOff_${currentRequestId}`);
           window.location.href = "user_dash.html";
         } else {
           const data = await res.json();
