@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service Declined - RESQ Kerala</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-[#181411] text-white min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-md w-full text-center space-y-8">
+        <div
+            class="size-24 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-red-500/20">
+            <span class="material-symbols-outlined text-6xl">heart_broken</span>
+        </div>
+
+        <div class="space-y-4">
+            <h1 class="text-4xl font-black">We're So Sorry!</h1>
+            <p class="text-slate-400 font-medium leading-relaxed">
+                The mechanic you selected is currently unable to accept your request. This could be due to a sudden
+                emergency or a technical issue.
+            </p>
+        </div>
+
+        <div class="bg-white/5 p-8 rounded-[32px] border border-white/10 shadow-xl">
+            <p class="text-sm font-bold text-orange-400 mb-6">Don't worry, your safety is still our priority!</p>
+            <button onclick="findAnother()"
+                class="w-full h-16 bg-orange-600 text-white font-black rounded-2xl shadow-xl shadow-orange-600/30 hover:scale-105 transition active:scale-95 flex items-center justify-center gap-3">
+                <span class="material-symbols-outlined">person_search</span>
+                Find Another Mechanic
+            </button>
+        </div>
+
+        <button onclick="window.location.href='user_dash.html'"
+            class="text-slate-500 hover:text-white font-bold transition">
+            Back to Dashboard
+        </button>
+    </div>
+
+    <script>
+        function findAnother() {
+            localStorage.removeItem("currentRequestId");
+            window.location.href = "service.html";
+        }
+    </script>
+</body>
+
+</html>

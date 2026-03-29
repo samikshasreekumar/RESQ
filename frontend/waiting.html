@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waiting for Approval - RESQ Kerala</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#f27f0d",
+            "background-light": "#f8f7f5",
+            "background-dark": "#181411",
+            "dash-dark": "#221910",
+          },
+          fontFamily: { display: ["Lexend"] }
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .loader {
+      width: 100px;
+      height: 100px;
+      border: 8px solid rgba(242, 127, 13, 0.1);
+      border-top: 8px solid #f27f0d;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+</head>
+
+<body class="bg-background-light dark:bg-dash-dark font-display text-slate-900 dark:text-white min-h-screen">
+
+  <script>
+      (async () => {
+        const phone = localStorage.getItem("u_phone");
+        const role = localStorage.getItem("u_role");
+        if (!phone || role !== "user") { window.location.href = "index.html"; return; }
+        try {
+          const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+          if (!res.ok) { localStorage.removeItem("u_phone"); localStorage.removeItem("u_role"); window.location.href = "index.html"; }
+        } catch (e) { /* Fail open */ }
+      })();
+  </script>
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 flex flex-col">
+      <div class="p-6 flex items-center gap-3">
+        <div class="size-10 rounded-full bg-primary flex items-center justify-center text-white">
+          <span class="material-symbols-outlined">car_repair</span>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold">RESQ Kerala</h1>
+          <p class="text-xs text-slate-500">Emergency Support</p>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-2 space-y-1 text-slate-600 dark:text-slate-100">
+        <a href="user_dash.html"
+          class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+          <span class="material-symbols-outlined">dashboard</span> Dashboard
+        </a>
+        <a href="service_history.html"
+          class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+          <span class="material-symbols-outlined">history</span> Request History
+        </a>
+        <a href="my_vehicles.html"
+          class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+          <span class="material-symbols-outlined">directions_car</span> My Vehicles
+        </a>
+        <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+          <a href="settings.html"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+            <span class="material-symbols-outlined">settings</span> Settings
+          </a>
+        </div>
+      </nav>
+
+      <!-- USER PROFILE -->
+      <div class="p-4 mt-auto">
+        <button onclick="logout()"
+          class="w-full bg-slate-50 dark:bg-[#27211b] p-4 rounded-xl flex items-center gap-3 border border-slate-200 dark:border-slate-800 hover:bg-red-500/10 transition group">
+          <div id="sideProfilePhoto"
+            class="size-10 rounded-full bg-primary text-white flex items-center justify-center overflow-hidden">U</div>
+          <div class="text-left">
+            <p id="userName" class="text-sm font-semibold text-slate-900 dark:text-white">User</p>
+            <p class="text-xs text-slate-500 group-hover:text-red-400">Logout</p>
+          </div>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 overflow-y-auto p-8 flex items-center justify-center">
+      <div id="statusContainer" class="max-w-md w-full text-center space-y-8 animate-in fade-in zoom-in duration-500">
+
+        <div class="relative flex justify-center">
+          <div class="loader"></div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-4xl animate-pulse">emergency_share</span>
+          </div>
+        </div>
+
+        <div>
+          <h2 id="mainTitle" class="text-3xl font-black mb-4">Awaiting Mechanic Approval</h2>
+          <p id="subText" class="text-slate-500 font-medium">Please stay on this page. We're double-checking with the
+            mechanic to ensure immediate availability.</p>
+        </div>
+
+        <div
+          class="bg-white dark:bg-background-dark p-8 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-xl">
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Assigned Professional</p>
+          <div class="flex items-center justify-center gap-4">
+            <div id="mechPhoto"
+              class="size-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black overflow-hidden">
+              <span class="material-symbols-outlined text-3xl">person</span>
+            </div>
+            <div class="text-left">
+              <h3 id="mechanicName" class="text-xl font-bold">Searching...</h3>
+              <p class="text-sm text-primary font-bold">Fast Response Specialist</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <p class="text-[10px] uppercase font-black tracking-widest opacity-30">Request ID: <span id="reqId">...</span>
+          </p>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const phone = localStorage.getItem("phone");
+    const currentRequestId = localStorage.getItem("currentRequestId");
+    document.getElementById("reqId").innerText = currentRequestId || "Unknown";
+
+    if (!currentRequestId) {
+      window.location.href = "user_dash.html";
+    }
+
+    async function loadProfile() {
+      try {
+        const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+        if (res.ok) {
+          const user = await res.json();
+          document.getElementById("userName").innerText = user.name || "User";
+          if (user.profilePhoto) {
+            const photoUrl = `http://localhost:5001/${user.profilePhoto.replace(/\\/g, '/')}`;
+            document.getElementById("sideProfilePhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
+          }
+        }
+      } catch (err) { console.error(err); }
+    }
+    loadProfile();
+
+    function logout() {
+      localStorage.removeItem("u_phone");
+      localStorage.removeItem("u_role");
+      window.location.href = "index.html";
+    }
+
+    async function checkStatus() {
+      try {
+        const response = await fetch(`http://localhost:5001/api/requests/${currentRequestId}`);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const status = data.request.status;
+        const mechName = document.getElementById("mechanicName");
+        const mainTitle = document.getElementById("mainTitle");
+        const subText = document.getElementById("subText");
+
+        if (data.request.reassignedFrom) {
+          const prevName = data.previousMechanic ? data.previousMechanic.name : "initial professional";
+          const newName = data.mechanic ? data.mechanic.name : "a new professional";
+          const reason = data.request.failureReason || 'a reasonable problem';
+
+          mainTitle.innerText = "Reassigning Job...";
+          subText.innerText = `Work is being reassigned from ${prevName} to ${newName}. The initial professional who accepted has ${reason}, so ${newName} is coming to help you.`;
+        }
+        if (data.mechanic) {
+          mechName.innerText = data.mechanic.name;
+          if (data.mechanic.profilePhoto) {
+            const photoUrl = `http://localhost:5001/${data.mechanic.profilePhoto.replace(/\\/g, '/')}`;
+            document.getElementById("mechPhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
+          }
+        }
+
+        if (status === "Approved") {
+          mainTitle.innerText = "Request Approved! âœ…";
+          mainTitle.classList.add("text-emerald-500");
+          subText.innerText = "The mechanic has accepted. Get ready! Redirecting to live tracking...";
+          setTimeout(() => window.location.href = "mechanic_tracking.html", 2000);
+        }
+        else if (status === "Rejected") {
+          window.location.href = "declined.html";
+        }
+        else {
+          setTimeout(checkStatus, 3000);
+        }
+      } catch (error) {
+        console.error(error);
+        setTimeout(checkStatus, 5000);
+      }
+    }
+    checkStatus();
+
+    checkStatus();
+
+    // SOCKET.IO INTEGRATION FOR LIVE UPDATES
+    const socket = io("http://localhost:5001");
+    const uPhone = localStorage.getItem("u_phone") || localStorage.getItem("phone");
+
+    socket.on("connect", () => {
+      console.log("Connected to Real-time Updates");
+    });
+
+    socket.on("request_status_updated", (data) => {
+      // Only act if this update belongs to this user and request
+      if (data.phone === uPhone && data.requestId === currentRequestId) {
+        console.log("Live status update received:", data.status);
+
+        // Re-run status check to update UI immediately
+        checkStatus();
+
+        // Show a simple toast or alert if not already handled by status check
+        if (data.status === "Approved") {
+          // Already handled in checkStatus logic (redirects)
+        } else {
+          // For other statuses like Arrived, Work Started
+          // We can add logic to update UI if needed
+        }
+      }
+    });
+
+    // Cleanup on page leave
+    window.onbeforeunload = () => {
+      socket.disconnect();
+    };
+  </script>
+</body>
+
+</html>

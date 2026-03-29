@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Registration - RESQ Kerala</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f27f0d",
+                        "background-dark": "#221910",
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-[#221910] text-white min-h-screen flex items-center justify-center p-6">
+
+    <div class="w-full max-w-md bg-white/5 p-8 rounded-2xl border border-white/10 shadow-2xl">
+        <h1 class="text-3xl font-bold text-center mb-2">Registration</h1>
+        <p class="text-center text-slate-400 mb-8">Personal details for assistance</p>
+
+        <form id="regForm" class="space-y-6" onsubmit="registerUser(event)">
+            <div>
+                <label class="block text-sm font-semibold mb-2">Full Name</label>
+                <input id="userName" type="text" required
+                    class="w-full bg-[#393028] border-none rounded-xl h-12 px-4 focus:ring-2 focus:ring-primary"
+                    placeholder="Enter your name">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Date of Birth</label>
+                <input id="userDob" type="date" required
+                    class="w-full bg-[#393028] border-none rounded-xl h-12 px-4 focus:ring-2 focus:ring-primary">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Address</label>
+                <textarea id="userAddress" required
+                    class="w-full bg-[#393028] border-none rounded-xl p-4 focus:ring-2 focus:ring-primary" rows="3"
+                    placeholder="Enter your full address"></textarea>
+            </div>
+
+            <button type="submit"
+                class="w-full h-14 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">save</span>
+                Save and Continue
+            </button>
+        </form>
+    </div>
+
+    <script>
+        async function registerUser(e) {
+            e.preventDefault();
+            const phone = localStorage.getItem("phone");
+            const name = document.getElementById("userName").value.trim();
+            const dob = document.getElementById("userDob").value;
+            const address = document.getElementById("userAddress").value.trim();
+
+            if (!phone) {
+                alert("Session expired. Please login again.");
+                window.location.href = "index.html";
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5001/api/user/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, name, dob, address })
+                });
+
+                if (response.ok) {
+                    localStorage.setItem("username", name);
+                    alert("Profile saved! Now please add your vehicle.");
+                    window.location.href = "add_newvehicle.html";
+                } else {
+                    const data = await response.json();
+                    alert(data.message || "Registration failed");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Server error");
+            }
+        }
+    </script>
+
+</body>
+
+</html>
+

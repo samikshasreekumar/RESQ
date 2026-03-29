@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Monitoring - RESQ Kerala</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+  <style>
+    @keyframes flash-red {
+      0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
+      70% { box-shadow: 0 0 0 20px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    }
+    .fraud-alert { animation: flash-red 2s infinite; }
+  </style>
+</head>
+
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-white min-h-screen p-8">
+
+  <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 border-b border-white/10 pb-6">
+    <div>
+      <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Admin Monitoring Dashboard</h1>
+      <p class="text-sm text-slate-500 font-medium">System Overview & Management</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-4">
+      <a href="admin_mechanic_approval.html"
+        class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-orange-600/20 transition flex items-center gap-2">
+        <span class="material-symbols-outlined">how_to_reg</span>
+        Mechanic Approvals
+      </a>
+      <button onclick="toggleMechanicsTable()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-600/20 transition flex items-center gap-2">
+        <span class="material-symbols-outlined">group</span>
+        Manage Mechanics
+      </button>
+      <div class="h-10 w-px bg-white/10 mx-2 hidden md:block"></div>
+      <nav class="flex items-center gap-4">
+        <a href="admin_history.html"
+          class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-white px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-white/5 hover:bg-primary transition font-bold group">
+          <span class="material-symbols-outlined text-lg">history</span>
+          History
+        </a>
+        <button onclick="logout()"
+          class="flex items-center gap-2 text-red-500 hover:text-white px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-600 border border-red-500/20 transition font-black group">
+          <span
+            class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">logout</span>
+          LOGOUT
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ===== STATS SECTION ===== -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow">
+      <h2 class="text-lg font-semibold mb-2">Active Services</h2>
+      <p class="text-4xl font-bold text-yellow-500">0</p>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow">
+      <h2 class="text-lg font-semibold mb-2">Pending Requests</h2>
+      <p class="text-4xl font-bold text-blue-500">0</p>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow">
+      <h2 class="text-lg font-semibold mb-2">Completed Services</h2>
+      <p class="text-4xl font-bold text-green-500">0</p>
+    </div>
+
+  </div>
+
+
+  <!-- Temporary alert container for Fraud messages -->
+  <div id="adminAlertContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+  <!-- ===== REQUEST TABLE ===== -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow overflow-hidden">
+    <table class="min-w-full text-left">
+      <thead class="bg-slate-200 dark:bg-slate-700 text-sm uppercase tracking-wider">
+        <tr>
+          <th class="px-6 py-4">ID</th>
+          <th class="px-6 py-4">Location</th>
+          <th class="px-6 py-4">User</th>
+          <th class="px-6 py-4">Issue</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4">Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="6" class="text-center py-6 text-gray-400">
+            No requests yet
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== MECHANICS TABLE ===== -->
+  <div id="mechanicsSection" class="hidden transition-all duration-300">
+    <div class="mt-12 mb-6 flex justify-between items-center">
+      <h2 class="text-2xl font-bold">Manage Active Mechanics</h2>
+      <button onclick="toggleMechanicsTable()" class="text-slate-500 hover:text-white transition">
+        <span class="material-symbols-outlined text-3xl">close</span>
+      </button>
+    </div>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow overflow-hidden mb-12">
+      <table class="min-w-full text-left">
+        <thead class="bg-slate-200 dark:bg-slate-700 text-sm uppercase tracking-wider">
+          <tr>
+            <th class="px-6 py-4">Name & Title</th>
+            <th class="px-6 py-4">Phone</th>
+            <th class="px-6 py-4">District</th>
+            <th class="px-6 py-4">Status</th>
+            <th class="px-6 py-4">Action</th>
+          </tr>
+        </thead>
+        <tbody id="mechanicsBody">
+          <tr>
+            <td colspan="5" class="text-center py-6 text-gray-400">Loading mechanics...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- ===== SCRIPT ===== -->
+  <script>
+
+    // Check Login
+    const adminUser = localStorage.getItem("adminUser");
+    if (!adminUser) {
+      window.location.href = "admin_login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("adminUser");
+      window.location.href = "admin_login.html";
+    }
+
+    const API_BASE = "http://localhost:5001/api/admin";
+
+    // ===== GET DATA =====
+    async function updateDashboard() {
+      try {
+        // 1. Stats
+        const statsRes = await fetch(`${API_BASE}/stats`);
+        const stats = await statsRes.json();
+
+        document.querySelectorAll(".text-4xl")[0].innerText = stats.active || 0;
+        document.querySelectorAll(".text-4xl")[1].innerText = stats.pending || 0;
+        document.querySelectorAll(".text-4xl")[2].innerText = stats.completed || 0;
+
+        // 2. Requests Table
+        const reqRes = await fetch(`${API_BASE}/requests`);
+        const requests = await reqRes.json();
+
+        renderTable(requests);
+
+      } catch (error) {
+        console.error("Dashboard error:", error);
+      }
+    }
+
+    // ===== STATUS BADGE =====
+    function getStatusBadge(status) {
+      if (status === "Pending") return `<span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">Pending</span>`;
+      if (status === "Approved" || status === "Arrived" || status === "Work Started") return `<span class="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-xs font-bold">${status}</span>`;
+      if (status === "Completed") return `<span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold">Completed</span>`;
+      if (status === "Rejected") return `<span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">Rejected</span>`;
+      return status;
+    }
+
+    // ===== RENDER TABLE =====
+    function renderTable(requests) {
+      const tbody = document.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      if (requests.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400">No requests yet</td></tr>`;
+        return;
+      }
+
+      requests.forEach(req => {
+        const row = document.createElement("tr");
+        row.className = "border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition";
+        row.innerHTML = `
+      <td class="px-6 py-4 font-mono text-xs text-gray-500">${req.id.split('-')[0]}...</td>
+      <td class="px-6 py-4 text-sm">${req.district || 'Kerala'}</td>
+      <td class="px-6 py-4 text-sm font-semibold">${req.userPhone}</td>
+      <td class="px-6 py-4 text-sm">${req.issueType}</td>
+      <td class="px-6 py-4 text-sm">${getStatusBadge(req.status)}</td>
+      <td class="px-6 py-4 text-xs text-gray-400">${new Date(req.createdAt).toLocaleString()}</td>
+    `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // ===== INIT =====
+    updateDashboard();
+    fetchMechanics();
+    setInterval(updateDashboard, 5000); // Live poll
+
+    async function fetchMechanics() {
+      try {
+        const res = await fetch(`${API_BASE}/mechanics/all`);
+        const mechanics = await res.json();
+        renderMechanics(mechanics);
+      } catch (err) {
+        console.error("Error fetching mechanics:", err);
+      }
+    }
+
+    function renderMechanics(mechanics) {
+      const tbody = document.getElementById("mechanicsBody");
+      tbody.innerHTML = "";
+
+      if (mechanics.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400">No approved mechanics found</td></tr>`;
+        return;
+      }
+
+      mechanics.forEach(m => {
+        const isSuspended = m.status === 'suspended';
+        const row = document.createElement("tr");
+        row.className = "border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition";
+        row.innerHTML = `
+          <td class="px-6 py-4">
+            <div class="font-bold text-slate-900 dark:text-white">${m.name}</div>
+            <div class="text-xs text-orange-500">${m.jobTitle || 'Mechanic'}</div>
+          </td>
+          <td class="px-6 py-4 text-sm">${m.phone}</td>
+          <td class="px-6 py-4 text-sm">${m.district}</td>
+          <td class="px-6 py-4 text-sm">
+            <span class="px-2 py-1 rounded-full text-xs font-bold ${isSuspended ? 'bg-red-500/20 text-red-500' : 'bg-green-500/20 text-green-500'}">
+              ${m.status.toUpperCase()}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <button onclick="toggleSuspension('${m.phone}', ${isSuspended})" 
+              class="text-xs font-bold px-3 py-1 rounded transition ${isSuspended ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'}">
+              ${isSuspended ? 'Unsuspend' : 'Suspend'}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function toggleSuspension(phone, isSuspended) {
+      const action = isSuspended ? 'unsuspend' : 'suspend';
+      if (!confirm(`Are you sure you want to ${action} this mechanic?`)) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/mechanics/${phone}/${action}`, { method: 'POST' });
+        if (res.ok) {
+          fetchMechanics();
+        } else {
+          alert(`Failed to ${action} mechanic`);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function toggleMechanicsTable() {
+      const section = document.getElementById("mechanicsSection");
+      if (section.classList.contains("hidden")) {
+        section.classList.remove("hidden");
+        // Scroll to it smoothly
+        setTimeout(() => {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } else {
+        section.classList.add("hidden");
+      }
+    }
+
+    // ===== SOCKET CONNECTION FOR REAL-TIME FRAUD ALERTS =====
+    const socket = io("http://localhost:5001");
+
+    socket.on("fraud_alert_admin", (data) => {
+      console.log("FRAUD ALERT RECEIVED:", data);
+      
+      const alertBox = document.createElement("div");
+      alertBox.className = "bg-red-600 text-white p-4 rounded-xl shadow-2xl flex items-start gap-3 w-96 animate-in slide-in-from-right duration-500 border border-red-400";
+      alertBox.innerHTML = `
+        <span class="material-symbols-outlined text-3xl">warning</span>
+        <div class="flex-1">
+          <p class="font-black text-lg mb-1">Issue Reported!</p>
+          <p class="text-sm font-medium opacity-90 leading-relaxed">
+            Customer Number: <span class="font-bold">${data.userPhone}</span> <br>
+            Mechanic Number: <span class="font-bold">${data.mechanicId || 'Unknown'}</span> <br>
+            Message: <b>"${data.reason}"</b>
+          </p>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-white hover:text-red-200 transition">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      `;
+
+      document.getElementById("adminAlertContainer").appendChild(alertBox);
+
+      // Flash audio notification (optional beep)
+      // new Audio('data:audio/mp3;base64,...').play();
+    });
+
+  </script>
+
+</body>
+
+</html>

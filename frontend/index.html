@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RESQ - Emergency Assistance Kerala</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#f27f0d",
+            "background-light": "#f8f7f5",
+            "background-dark": "#181411",
+          },
+          fontFamily: {
+            display: ["Lexend", "sans-serif"]
+          },
+          animation: {
+            'pop': 'pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+            'fade-up': 'fadeUp 0.8s ease-out forwards',
+            'fade-in': 'fadeIn 1.2s ease-out forwards',
+            'pulse-slow': 'pulseSlow 3s infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+          },
+          keyframes: {
+            pop: {
+              '0%': { transform: 'scale(0.8)', opacity: '0' },
+              '100%': { transform: 'scale(1)', opacity: '1' },
+            },
+            fadeUp: {
+              '0%': { transform: 'translateY(20px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' },
+            },
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            pulseSlow: {
+              '0%, 100%': { transform: 'scale(1)', opacity: '0.1' },
+              '50%': { transform: 'scale(1.1)', opacity: '0.2' },
+            },
+            glow: {
+              '0%': { textShadow: '0 0 10px rgba(242, 127, 13, 0.5)' },
+              '100%': { textShadow: '0 0 30px rgba(242, 127, 13, 1), 0 0 10px rgba(242, 127, 13, 0.5)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Hide scrollbar for a cleaner snap effect */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      /* IE and Edge */
+      scrollbar-width: none;
+      /* Firefox */
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-background-light dark:bg-background-dark font-display h-screen overflow-y-scroll snap-y snap-mandatory no-scrollbar text-white relative">
+  <!-- Decorative background elements -->
+  <div
+    class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none -z-10 animate-pulse-slow">
+  </div>
+
+  <!-- Admin Login Floating Button (Hidden by default, shown on scroll) -->
+  <a href="admin_login.html" id="floating-admin-btn"
+    class="fixed top-6 right-6 z-50 px-5 py-2.5 flex items-center gap-2 rounded-full border border-white/20 text-white font-semibold backdrop-blur-md bg-white/5 hover:bg-white/20 hover:border-white/50 transition-all duration-500 opacity-0 pointer-events-none translate-y-[-20px]">
+    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+      </path>
+    </svg>
+    Admin Login
+  </a>
+
+  <!-- Mechanic Login Floating Button (Hidden by default, shown on scroll) -->
+  <a href="#" id="floating-mechanic-btn" onclick="openMechanicLogin(event)"
+    class="fixed top-6 left-6 z-50 px-5 py-2.5 flex items-center gap-2 rounded-full border border-white/20 text-white font-semibold backdrop-blur-md bg-white/5 hover:bg-white/20 hover:border-white/50 transition-all duration-500 opacity-0 pointer-events-none translate-y-[-20px]">
+    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+      </path>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+      </path>
+    </svg>
+    Mechanic Login
+  </a>
+
+  <!-- Landing Section -->
+  <section class="h-screen w-full snap-start flex flex-col items-center justify-center relative overflow-hidden">
+
+    <div class="text-center relative z-10">
+      <h1
+        class="text-8xl md:text-[10rem] font-extrabold text-primary tracking-tight mb-4 animate-pop delay-100 opacity-0"
+        style="animation-delay: 0.1s;">RESQ</h1>
+      <p class="text-xl md:text-3xl font-medium text-white/90 tracking-[0.2em] uppercase animate-fade-up opacity-0"
+        style="animation-delay: 0.5s;">
+        Emergency Assistance
+        <span class="block text-sm md:text-base opacity-60 tracking-widest mt-2 animate-fade-in opacity-0"
+          style="animation-delay: 0.8s;">Kerala</span>
+      </p>
+    </div>
+
+    <div
+      class="absolute bottom-12 flex flex-col items-center animate-bounce text-white/70 hover:text-white cursor-pointer transition-colors duration-300 opacity-0 animate-fade-in"
+      style="animation-delay: 1.2s;"
+      onclick="document.getElementById('login-section').scrollIntoView({behavior: 'smooth'})">
+      <span class="text-[10px] uppercase tracking-[0.3em] mb-3 font-semibold">Get Started</span>
+      <div class="p-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
+        <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            class="animate-pulse"></path>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Login Section -->
+  <section id="login-section" class="h-screen w-full snap-start flex items-center justify-center px-4 pt-10 pb-10">
+    <div class="w-full max-w-md bg-white dark:bg-[#27211b] p-8 rounded-xl shadow-2xl">
+
+      <h2 class="text-3xl font-extrabold text-center text-primary mb-2">User Login</h2>
+      <p class="text-center text-black dark:text-white/60 mb-8">Enter your details to continue</p>
+
+      <!-- User Inputs -->
+      <label class="font-semibold text-white">Mobile Number</label>
+      <input id="phone" type="tel" placeholder="Enter 10-digit mobile number" class="w-full mt-2 p-3 rounded-xl border-2 border-orange-400
+             bg-[#1f1a15]
+             text-white
+             placeholder-white/60
+             focus:outline-none focus:ring-2 focus:ring-orange-500
+             focus:border-orange-500 transition">
+
+      <button onclick="sendOTP()"
+        class="w-full h-14 mt-6 bg-primary text-white text-lg font-bold rounded-xl hover:opacity-90 transition">
+        Get OTP
+      </button>
+
+    </div>
+  </section>
+
+  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io("http://localhost:5001");
+
+    // Intersection Observer to show/hide Floating Buttons
+    const observer = new IntersectionObserver((entries) => {
+      const adminBtn = document.getElementById("floating-admin-btn");
+      const mechanicBtn = document.getElementById("floating-mechanic-btn");
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          adminBtn.classList.remove("opacity-0", "pointer-events-none", "translate-y-[-20px]");
+          adminBtn.classList.add("opacity-100", "pointer-events-auto", "translate-y-0");
+          mechanicBtn.classList.remove("opacity-0", "pointer-events-none", "translate-y-[-20px]");
+          mechanicBtn.classList.add("opacity-100", "pointer-events-auto", "translate-y-0");
+        } else {
+          adminBtn.classList.add("opacity-0", "pointer-events-none", "translate-y-[-20px]");
+          adminBtn.classList.remove("opacity-100", "pointer-events-auto", "translate-y-0");
+          mechanicBtn.classList.add("opacity-0", "pointer-events-none", "translate-y-[-20px]");
+          mechanicBtn.classList.remove("opacity-100", "pointer-events-auto", "translate-y-0");
+        }
+      });
+    }, { threshold: 0.3 }); // Trigger when 30% of the login section is visible
+
+    observer.observe(document.getElementById("login-section"));
+
+    function openMechanicLogin(e) {
+      e.preventDefault();
+      // Temporarily transform the main login form into a mechanic login form
+      document.querySelector("h2").textContent = "Mechanic Login";
+      document.querySelector("p").textContent = "Enter your mechanic details to continue";
+      sessionStorage.setItem("otp_role_override", "mechanic");
+    }
+
+    function sendOTP() {
+      const phone = document.getElementById("phone").value.trim();
+      const role = sessionStorage.getItem("otp_role_override") || "user";
+
+      if (!/^[6-9]\d{9}$/.test(phone)) {
+        alert("Enter a valid Indian mobile number");
+        return;
+      }
+
+      // Store phone and role in sessionStorage
+      sessionStorage.setItem("otp_phone", phone);
+      sessionStorage.setItem("otp_role", role);
+
+      // Emit request_otp to backend
+      socket.emit("request_otp", { phone });
+
+      // Reset the override for next time
+      sessionStorage.removeItem("otp_role_override");
+    }
+
+    // Listen for otp_sent
+    socket.on("otp_sent", (data) => {
+      if (data.testOtp) {
+        sessionStorage.setItem("pending_test_otp", data.testOtp);
+      }
+      window.location.href = "otp.html";
+    });
+
+    socket.on("otp_error", (data) => {
+      alert(data.message);
+    });
+  </script>
+
+</body>
+
+</html>

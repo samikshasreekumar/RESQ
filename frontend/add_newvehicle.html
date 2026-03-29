@@ -1,0 +1,254 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Vehicle - RESQ Kerala</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#f27f0d",
+            "background-light": "#f8f7f5",
+            "background-dark": "#181411",
+            "dash-dark": "#221910",
+          },
+          fontFamily: { display: ["Lexend"] }
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-dash-dark font-display text-slate-900 dark:text-white min-h-screen">
+
+  <!-- ðŸ”’ AUTH GUARD -->
+  <script>
+      (async () => {
+        const phone = localStorage.getItem("phone");
+        const role = localStorage.getItem("role");
+        if (!phone || role !== "user") { window.location.href = "index.html"; return; }
+        try {
+          const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+          if (!res.ok) { localStorage.clear(); window.location.href = "index.html"; }
+        } catch (e) { /* Fail open */ }
+      })();
+  </script>
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 flex flex-col">
+      <div class="p-6 flex items-center gap-3">
+        <div class="size-10 rounded-full bg-primary flex items-center justify-center text-white">
+          <span class="material-symbols-outlined">car_repair</span>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold">RESQ Kerala</h1>
+          <p class="text-xs text-slate-500">Emergency Support</p>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-2 space-y-1 text-slate-600 dark:text-slate-100">
+        <a href="user_dash.html"
+          class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+          <span class="material-symbols-outlined">dashboard</span> Dashboard
+        </a>
+        <a href="service_history.html"
+          class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+          <span class="material-symbols-outlined">history</span> Request History
+        </a>
+        <a href="my_vehicles.html" class="flex items-center gap-3 px-4 py-3 bg-primary text-white rounded shadow-lg">
+          <span class="material-symbols-outlined">directions_car</span> My Vehicles
+        </a>
+        <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+          <a href="settings.html"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+            <span class="material-symbols-outlined">settings</span> Settings
+          </a>
+        </div>
+      </nav>
+
+      <!-- USER PROFILE -->
+      <div class="p-4 mt-auto">
+        <div
+          class="bg-slate-50 dark:bg-[#27211b] p-4 rounded-xl flex items-center gap-3 border border-slate-200 dark:border-slate-800">
+          <div id="sideProfilePhoto"
+            class="size-10 rounded-full bg-primary text-white flex items-center justify-center overflow-hidden">U</div>
+          <div>
+            <p id="userName" class="text-sm font-semibold">User</p>
+            <p class="text-xs text-slate-500">RESQ Member</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 overflow-y-auto p-8">
+      <div class="max-w-3xl mx-auto">
+        <header class="mb-10 text-center">
+          <h2 class="text-xs uppercase tracking-widest font-black text-primary mb-2">Registration</h2>
+          <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white">Add New Vehicle</h1>
+          <p class="text-slate-500 mt-2 font-medium">Register your vehicle for faster support during breakdowns.</p>
+        </header>
+
+        <div
+          class="bg-white dark:bg-background-dark p-10 rounded-[40px] border border-slate-200 dark:border-slate-800 shadow-xl">
+          <form id="vehicleForm" class="space-y-8" onsubmit="return false;">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Make & Model</label>
+                <div class="relative">
+                  <span
+                    class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-primary">directions_car</span>
+                  <input id="vehicleModel" type="text" placeholder="e.g. Maruti Suzuki Swift"
+                    class="w-full h-14 pl-14 pr-6 rounded-2xl bg-slate-50 dark:bg-white/5 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold">
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Vehicle Brand</label>
+                <div class="relative">
+                  <span
+                    class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-primary">branding_watermark</span>
+                  <input id="vehicleBrand" type="text" placeholder="e.g. Maruti Suzuki"
+                    class="w-full h-14 pl-14 pr-6 rounded-2xl bg-slate-50 dark:bg-white/5 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold">
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Number Plate</label>
+                <div class="relative">
+                  <span
+                    class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-primary">tag</span>
+                  <input id="vehicleNumber" type="text" placeholder="KL 01 AB 1234"
+                    class="w-full h-14 pl-14 pr-6 rounded-2xl bg-slate-50 dark:bg-white/5 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold uppercase">
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Vehicle Color</label>
+                <div class="relative">
+                  <span
+                    class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-primary">palette</span>
+                  <input id="vehicleColor" type="text" placeholder="e.g. Crimson Red"
+                    class="w-full h-14 pl-14 pr-6 rounded-2xl bg-slate-50 dark:bg-white/5 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold">
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Vehicle Category</label>
+              <div class="grid grid-cols-3 gap-4">
+                <label class="cursor-pointer">
+                  <input type="radio" name="vehicleType" value="Car" class="hidden peer" checked>
+                  <div
+                    class="flex flex-col items-center gap-3 p-6 rounded-3xl border-2 border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+                    <span class="material-symbols-outlined text-3xl">directions_car</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Car</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="vehicleType" value="Bike" class="hidden peer">
+                  <div
+                    class="flex flex-col items-center gap-3 p-6 rounded-3xl border-2 border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+                    <span class="material-symbols-outlined text-3xl">moped</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Bike</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="vehicleType" value="Heavy" class="hidden peer">
+                  <div
+                    class="flex flex-col items-center gap-3 p-6 rounded-3xl border-2 border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/10 transition-all">
+                    <span class="material-symbols-outlined text-3xl">local_shipping</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Heavy</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <button type="button" onclick="saveVehicle()"
+              class="w-full h-16 bg-primary text-white font-black rounded-3xl shadow-xl shadow-primary/30 hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-3 text-lg">
+              <span class="material-symbols-outlined">add_circle</span>
+              Confirm & Register Vehicle
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const phone = localStorage.getItem("phone");
+
+    async function loadProfile() {
+      try {
+        const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+        if (res.ok) {
+          const user = await res.json();
+          document.getElementById("userName").innerText = user.name || "User";
+          if (user.profilePhoto) {
+            const photoUrl = `http://localhost:5001/${user.profilePhoto.replace(/\\/g, '/')}`;
+            document.getElementById("sideProfilePhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
+          }
+        }
+      } catch (err) { console.error(err); }
+    }
+    loadProfile();
+
+    async function saveVehicle() {
+      const model = document.getElementById("vehicleModel").value.trim();
+      const brand = document.getElementById("vehicleBrand").value.trim();
+      const number = document.getElementById("vehicleNumber").value.trim();
+      const color = document.getElementById("vehicleColor").value.trim();
+      const type = document.querySelector('input[name="vehicleType"]:checked').value;
+
+      if (!model || !brand || !number || !color) {
+        alert("Please fill in all details");
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:5001/api/vehicles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userPhone: phone, model, brand, number, color, type })
+        });
+
+        if (res.ok) {
+          alert("Vehicle registered successfully!");
+          window.location.href = "my_vehicles.html";
+        } else {
+          const data = await res.json();
+          alert(data.message || "Registration failed");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server error. Please try again.");
+      }
+    }
+  </script>
+</body>
+
+</html>
+

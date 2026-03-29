@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Mechanic Approvals - RESQ Kerala</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+
+    /* Document Thumbnail Hover Effects */
+    .doc-thumbnail {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #3f3f46;
+      border: 2px solid #27211b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .doc-thumbnail:hover {
+      transform: scale(1.1);
+      z-index: 10;
+      border-color: #f27f0d;
+    }
+
+    .table-container {
+      background: #27211b;
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1.5fr 1fr 1.5fr;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .table-header p {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 800;
+      color: #94a3b8;
+    }
+
+    .mechanic-row {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1.5fr 1fr 1.5fr;
+      padding: 1.5rem 2rem;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      transition: background 0.2s;
+    }
+
+    .mechanic-row:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .mechanic-row:last-child {
+      border-bottom: none;
+    }
+
+    .avatar-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(242, 127, 13, 0.1);
+      color: #f27f0d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body class="bg-[#181411] min-h-screen p-8 text-slate-100">
+
+  <div class="max-w-[1400px] mx-auto">
+
+    <!-- Top Nav / Back Button -->
+    <div class="mb-8">
+      <a href="admin_moni.html"
+        class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition font-bold text-sm">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+        Back to Dashboard
+      </a>
+    </div>
+
+    <!-- Header Section -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-4">
+      <div class="max-w-xl">
+        <h1 class="text-4xl font-black text-white mb-2">Mechanic Approval Queue</h1>
+        <p class="text-sm text-slate-400 font-medium leading-relaxed">Review and manage professional certifications and
+          identity documents for pending mechanic applications across Kerala districts.</p>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button
+          class="flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 text-white hover:bg-white/5 transition font-bold text-sm">
+          <span class="material-symbols-outlined text-lg">filter_list</span>
+          Filter
+        </button>
+        <button
+          class="flex items-center gap-2 bg-[#f27f0d] text-white px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(242,127,13,0.3)] hover:scale-105 transition text-sm">
+          <span class="material-symbols-outlined text-lg">download</span>
+          Export List
+        </button>
+      </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-container">
+
+      <div class="table-header">
+        <p>MECHANIC DETAILS</p>
+        <p>CONTACT INFO</p>
+        <p>DISTRICT</p>
+        <p>ID DOCUMENTS</p>
+        <p class="text-center">DECISION</p>
+      </div>
+
+      <div id="mechanicList" class="flex flex-col min-h-[300px]">
+        <!-- Loading State -->
+        <div class="flex-1 flex items-center justify-center p-12">
+          <p class="text-slate-500 font-bold animate-pulse">Loading queue...</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Pagination (Visual Only) -->
+    <div class="flex justify-between items-center mt-8">
+      <p id="showingText" class="text-sm text-slate-400 font-medium">Showing <b class="text-white">0</b> pending
+        applications</p>
+
+      <div class="flex items-center gap-2">
+        <button
+          class="size-10 rounded-full flex items-center justify-center hover:bg-white/5 text-slate-400 transition"><span
+            class="material-symbols-outlined text-sm">chevron_left</span></button>
+        <button
+          class="size-10 rounded-full bg-[#f27f0d] text-white font-bold flex items-center justify-center">1</button>
+        <button
+          class="size-10 rounded-full hover:bg-white/5 text-slate-400 font-bold flex items-center justify-center transition">2</button>
+        <button
+          class="size-10 rounded-full hover:bg-white/5 text-slate-400 font-bold flex items-center justify-center transition">3</button>
+        <button
+          class="size-10 rounded-full flex items-center justify-center hover:bg-white/5 text-slate-400 transition"><span
+            class="material-symbols-outlined text-sm">chevron_right</span></button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Check Login
+    if (!localStorage.getItem("adminUser")) {
+      window.location.href = "admin_login.html";
+    }
+
+    const BACKEND_URL = 'http://localhost:5001/api/admin';
+
+    // Helper to get initials
+    function getInitials(name) {
+      if (!name) return "??";
+      const parts = name.trim().split(" ");
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    // Helper to extract email domain or create a fake one if missing
+    function generateEmail(name) {
+      const cleanName = name.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+      return `${cleanName}.m@email.com`;
+    }
+
+    // Helper for relative time (mocking "Applied 2 hours ago")
+    function getRelativeTime(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+
+      if (diffHrs < 1) return "Applied just now";
+      if (diffHrs === 1) return "Applied 1 hour ago";
+      if (diffHrs < 24) return `Applied ${diffHrs} hours ago`;
+      if (diffHrs < 48) return "Applied yesterday";
+      return `Applied ${Math.floor(diffHrs / 24)} days ago`;
+    }
+
+    async function loadPendingMechanics() {
+      const mechanicList = document.getElementById("mechanicList");
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/mechanics/pending`);
+        const mechanics = await response.json();
+
+        mechanicList.innerHTML = "";
+
+        document.getElementById("showingText").innerHTML = `Showing <b class="text-white">${mechanics.length}</b> pending applications`;
+
+        if (mechanics.length === 0) {
+          mechanicList.innerHTML = `
+            <div class="flex-1 flex flex-col items-center justify-center p-16 text-center">
+               <div class="size-24 rounded-full bg-white/5 flex items-center justify-center mb-4 text-slate-600">
+                  <span class="material-symbols-outlined text-5xl">task</span>
+               </div>
+               <p class="text-xl font-bold text-white mb-2">All Caught Up!</p>
+               <p class="text-slate-500 text-sm max-w-sm">There are currently no pending mechanic approvals in the queue.</p>
+            </div>
+          `;
+          return;
+        }
+
+        mechanics.forEach(mech => {
+
+          // Generate realistic placeholder data for the new UI fields
+          const initials = getInitials(mech.name);
+          const email = generateEmail(mech.name);
+          const timeAgo = getRelativeTime(mech.createdAt);
+          const district = mech.district || 'Kerala';
+
+          // Using placeholder images for document thumbnails to match the aesthetic if real ones aren't available/formatted right
+          const defaultDocPic = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'%3E%3C/path%3E%3Cpolyline points='14 2 14 8 20 8'%3E%3C/polyline%3E%3Cline x1='16' y1='13' x2='8' y2='13'%3E%3C/line%3E%3Cline x1='16' y1='17' x2='8' y2='17'%3E%3C/line%3E%3Cpolyline points='10 9 9 9 8 9'%3E%3C/polyline%3E%3C/svg%3E";
+
+          mechanicList.innerHTML += `
+            <div class="mechanic-row">
+              <!-- Name & Avatar -->
+              <div class="flex items-center gap-4 pr-4">
+                <div class="avatar-circle">${initials}</div>
+                <div>
+                  <h3 class="font-bold text-white text-base">${mech.name}</h3>
+                  <p class="text-xs text-slate-400 mt-0.5">${timeAgo}</p>
+                </div>
+              </div>
+              
+              <!-- Contact Info -->
+              <div class="pr-4">
+                <p class="font-bold text-white text-sm mb-0.5">${mech.phone}</p>
+                <p class="text-xs text-slate-500">${email}</p>
+              </div>
+              
+              <!-- District Pill -->
+              <div class="pr-4">
+                <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 border border-white/5 text-xs font-bold text-slate-300">
+                  ${district}
+                </span>
+              </div>
+              
+              <!-- Documents List -->
+              <div class="flex items-center pr-4">
+                <a href="http://localhost:5001/${mech.idDoc}" target="_blank" title="View ID" class="doc-thumbnail">
+                   <img src="${defaultDocPic}" alt="ID Doc" class="w-6 h-6 opacity-30">
+                </a>
+                <a href="http://localhost:5001/${mech.certDoc}" target="_blank" title="View Certificate" class="doc-thumbnail -ml-3">
+                   <img src="${defaultDocPic}" alt="Certificate" class="w-6 h-6 opacity-30">
+                </a>
+              </div>
+              
+              <!-- Actions -->
+              <div class="flex items-center justify-end gap-3 pl-2">
+                <button onclick="reject('${mech.phone}')" class="flex items-center gap-1.5 px-4 py-2 rounded-full border border-red-500/20 hover:bg-red-500/10 text-red-400 transition font-bold text-xs group">
+                  <span class="material-symbols-outlined text-sm group-hover:scale-110 transition">close</span>
+                  Reject
+                </button>
+                <button onclick="approve('${mech.phone}')" class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#f27f0d] hover:bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:-translate-y-0.5 transition font-bold text-xs group">
+                  <span class="material-symbols-outlined text-sm group-hover:scale-110 transition">check</span>
+                  Approve
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+      } catch (err) {
+        console.error(err);
+        mechanicList.innerHTML = `
+          <div class="p-8 text-center border border-red-500/20 bg-red-500/5 rounded-2xl m-6">
+            <p class='text-red-400 font-bold'>Error loading queued applications.</p>
+            <p class='text-red-500/70 text-sm mt-2'>Please ensure the backend server is running on port 5001.</p>
+          </div>
+        `;
+      }
+    }
+
+    async function approve(phone) {
+      if (!confirm("Are you sure you want to approve this professional?")) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/mechanics/${phone}/approve`, { method: 'POST' });
+        if (res.ok) {
+          loadPendingMechanics();
+        } else {
+          const data = await res.json();
+          alert("Error approving: " + (data.message || "Unknown error"));
+        }
+      } catch (err) {
+        alert("Connection Error: " + err.message);
+      }
+    }
+
+    async function reject(phone) {
+      if (!confirm("Are you sure you want to REJECT this application?")) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/mechanics/${phone}/reject`, { method: 'POST' });
+        if (res.ok) {
+          loadPendingMechanics();
+        } else {
+          alert("Error rejecting application.");
+        }
+      } catch (err) {
+        alert("Connection Error: " + err.message);
+      }
+    }
+
+    // Initial Load
+    loadPendingMechanics();
+
+  </script>
+</body>
+
+</html>

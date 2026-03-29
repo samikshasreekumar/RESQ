@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Work History | RESQ Kerala</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-[#0f172a] text-white min-h-screen">
+
+    <div class="max-w-6xl mx-auto p-6">
+        <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
+            <div>
+                <h1 class="text-3xl font-black text-blue-400">Work History</h1>
+                <p class="text-xs text-slate-500 font-medium">Completed Service Records</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="admin_moni.html"
+                    class="flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-xl hover:bg-slate-700 transition font-bold text-sm">
+                    <span class="material-symbols-outlined text-lg">dashboard</span>
+                    Dashboard
+                </a>
+                <button onclick="logout()"
+                    class="flex items-center gap-2 text-red-500 hover:text-white px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-600 border border-red-500/20 transition font-black text-xs group">
+                    <span
+                        class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">logout</span>
+                    LOGOUT
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-slate-800 text-slate-400 uppercase text-xs">
+                    <tr>
+                        <th class="p-4">Date</th>
+                        <th class="p-4">Mechanic</th>
+                        <th class="p-4">User</th>
+                        <th class="p-4">Issue</th>
+                        <th class="p-4">Area</th>
+                        <th class="p-4">Feedback</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-slate-500">Loading history...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Check Login
+        if (!localStorage.getItem("adminUser")) {
+            window.location.href = "admin_login.html";
+        }
+
+        function logout() {
+            localStorage.removeItem("adminUser");
+            window.location.href = "admin_login.html";
+        }
+
+        async function loadHistory() {
+            try {
+                const response = await fetch('http://localhost:5001/api/requests/history/all');
+                const history = await response.json();
+
+                const body = document.getElementById("historyBody");
+                body.innerHTML = "";
+
+                if (history.length === 0) {
+                    body.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-500">No completed requests found.</td></tr>';
+                    return;
+                }
+
+                history.forEach(item => {
+                    const stars = item.rating ? '<span class="text-yellow-500">' + '★'.repeat(item.rating) + '</span>' + '☆'.repeat(5 - item.rating) : '<span class="text-slate-600">Unrated</span>';
+                    const feedbackText = item.feedback ? `<div class="text-[10px] text-slate-500 italic mt-1 max-w-[150px] truncate" title="${item.feedback}">"${item.feedback}"</div>` : '';
+
+                    const row = `
+                        <tr class="border-t border-slate-800 hover:bg-slate-800/50 transition">
+                            <td class="p-4 text-sm">${new Date(item.updatedAt).toLocaleDateString()}</td>
+                            <td class="p-4 font-semibold">${item.Mechanic ? item.Mechanic.name : 'Unknown'}</td>
+                            <td class="p-4 text-sm text-slate-300">${item.userPhone}</td>
+                            <td class="p-4"><span class="px-2 py-1 bg-blue-500/10 text-blue-400 rounded text-xs">${item.issueType}</span></td>
+                            <td class="p-4 text-sm text-slate-400">${item.district || 'N/A'}</td>
+                            <td class="p-4">
+                                <div class="text-xs">${stars}</div>
+                                ${feedbackText}
+                            </td>
+                        </tr>
+                    `;
+                    body.innerHTML += row;
+                });
+            } catch (err) {
+                console.error(err);
+                document.getElementById("historyBody").innerHTML = '<tr><td colspan="6" class="p-8 text-center text-red-500">Error loading history.</td></tr>';
+            }
+        }
+
+        loadHistory();
+    </script>
+</body>
+
+</html>

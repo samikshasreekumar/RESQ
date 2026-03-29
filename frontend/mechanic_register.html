@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mechanic Registration - RESQ Kerala</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.5rem;
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      font-weight: 500;
+    }
+
+    input::placeholder {
+      color: #64748b !important;
+      /* Slate-500 */
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #f27f0d;
+      box-shadow: 0 0 0 2px #f27f0d;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      display: block;
+      color: #cbd5e1;
+    }
+
+    button {
+      transition: all 0.2s;
+    }
+  </style>
+</head>
+
+<body class="bg-[#221910] min-h-screen flex items-center justify-center px-4 py-10">
+
+  <div class="max-w-md w-full bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-2xl text-white border border-white/10">
+    <h1 class="text-3xl font-bold mb-6 text-center text-primary">Mechanic Registration</h1>
+
+    <label>Name</label>
+    <input type="text" id="name" placeholder="Full Name" required>
+
+    <label>Job Title (e.g. Senior Technician, Car Washing Expert)</label>
+    <input type="text" id="jobTitle" placeholder="Your Specialization" required>
+
+    <label>Profile Photo</label>
+    <input type="file" id="profilePhoto" accept="image/*"
+      class="text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+
+    <label>Phone Number</label>
+    <input type="text" id="phone" readonly class="opacity-70 cursor-not-allowed">
+
+    <label>District</label>
+    <select id="district" required>
+      <option value="" disabled selected>Select District</option>
+      <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+      <option value="Kollam">Kollam</option>
+      <option value="Pathanamthitta">Pathanamthitta</option>
+      <option value="Alappuzha">Alappuzha</option>
+      <option value="Kottayam">Kottayam</option>
+      <option value="Idukki">Idukki</option>
+      <option value="Ernakulam">Ernakulam</option>
+      <option value="Thrissur">Thrissur</option>
+      <option value="Palakkad">Palakkad</option>
+      <option value="Malappuram">Malappuram</option>
+      <option value="Kozhikode">Kozhikode</option>
+      <option value="Wayanad">Wayanad</option>
+      <option value="Kannur">Kannur</option>
+      <option value="Kasaragod">Kasaragod</option>
+    </select>
+
+    <label>Address (Local Area)</label>
+    <input type="text" id="address" placeholder="e.g. MG Road, Kochi" required>
+
+    <div class="mb-4">
+      <button onclick="detectLocation()"
+        class="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition">
+        ðŸ“ Detect My Location
+      </button>
+      <p id="locationStatus" class="text-xs text-gray-400 mt-1 text-center"></p>
+      <input type="hidden" id="latitude">
+      <input type="hidden" id="longitude">
+    </div>
+
+    <label>Experience (Years)</label>
+    <input type="number" id="experience" min="0" placeholder="Experience in years" required>
+
+    <label>Upload ID Document</label>
+    <input type="file" id="idDoc" accept="image/*,application/pdf"
+      class="text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+
+    <label>Upload Certification</label>
+    <input type="file" id="certDoc" accept="image/*,application/pdf"
+      class="text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+
+    <button onclick="submitRegistration()"
+      class="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl mt-6 shadow-lg transform active:scale-95">Submit
+      Registration</button>
+  </div>
+
+  <script>
+    // --- Configuration ---
+    const BACKEND_URL = 'http://localhost:5001/api/auth/register/mechanic';
+
+    // --- Initialization ---
+    const phone = localStorage.getItem("phone");
+    if (!phone) {
+      alert("Session expired. Please login again.");
+      window.location.href = "index.html";
+    }
+    document.getElementById('phone').value = phone;
+
+    let userLat = null;
+    let userLng = null;
+
+    function detectLocation() {
+      const status = document.getElementById('locationStatus');
+      if (!navigator.geolocation) {
+        status.innerText = "Geolocation not supported";
+        return;
+      }
+      status.innerText = "Detecting...";
+      navigator.geolocation.getCurrentPosition((pos) => {
+        userLat = pos.coords.latitude;
+        userLng = pos.coords.longitude;
+        document.getElementById('latitude').value = userLat;
+        document.getElementById('longitude').value = userLng;
+        status.innerText = `Location Detected: ${userLat.toFixed(4)}, ${userLng.toFixed(4)} âœ…`;
+        status.classList.remove('text-gray-400');
+        status.classList.add('text-green-400');
+      }, () => {
+        status.innerText = "Location permission denied";
+        status.classList.add('text-red-400');
+      });
+    }
+
+    // Check if duplicate registration
+    async function checkExistingRegistration() {
+      try {
+        const res = await fetch(`http://localhost:5001/api/auth/status/${phone}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === 'pending') {
+            window.location.href = "mechanic_pending.html";
+          } else if (data.status === 'approved') {
+            window.location.href = "mechanic_dash.html";
+          } else if (data.status === 'rejected') {
+            window.location.href = "mechanic_rejected.html";
+          }
+        }
+      } catch (err) {
+        // Ignore error if not found, means they can register
+      }
+    }
+    checkExistingRegistration();
+
+    async function submitRegistration() {
+      const name = document.getElementById('name').value.trim();
+      const jobTitle = document.getElementById('jobTitle').value.trim();
+      const district = document.getElementById('district').value;
+      const address = document.getElementById('address').value.trim();
+      const experience = document.getElementById('experience').value.trim();
+      const idFile = document.getElementById('idDoc').files[0];
+      const certFile = document.getElementById('certDoc').files[0];
+      const profilePhoto = document.getElementById('profilePhoto').files[0];
+      const lat = document.getElementById('latitude').value;
+      const lng = document.getElementById('longitude').value;
+
+      if (!name || !jobTitle || !phone || !district || !address || !experience || !idFile || !certFile || !profilePhoto) {
+        alert("Please fill all fields, upload documents and profile photo!");
+        return;
+      }
+
+      if (!lat || !lng) {
+        alert("Please detect your location!");
+        return;
+      }
+
+      // Create FormData
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('jobTitle', jobTitle);
+      formData.append('phone', phone);
+      formData.append('district', district);
+      formData.append('address', address);
+      formData.append('experience', experience);
+      formData.append('idDoc', idFile);
+      formData.append('certDoc', certFile);
+      formData.append('profilePhoto', profilePhoto);
+      formData.append('latitude', lat);
+      formData.append('longitude', lng);
+
+      try {
+        const response = await fetch(BACKEND_URL, {
+          method: 'POST',
+          body: formData // No Content-Type header needed for FormData; browser sets it with boundary
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("Registration submitted! Waiting for admin approval âœ…");
+          window.location.href = "mechanic_pending.html";
+        } else {
+          throw new Error(data.message || "Registration failed");
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Error submitting registration: " + err.message);
+      }
+    }
+  </script>
+
+</body>
+
+</html>
+

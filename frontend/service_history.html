@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service History - RESQ Kerala</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f27f0d",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221910",
+                    },
+                    fontFamily: { display: ["Lexend"] }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+
+    <!-- ðŸ”’ AUTH GUARD -->
+    <script>
+            (async () => {
+                const phone = localStorage.getItem("phone");
+                const role = localStorage.getItem("role");
+                if (!phone || role !== "user") { window.location.href = "index.html"; return; }
+                try {
+                    const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+                    if (!res.ok) { localStorage.clear(); window.location.href = "index.html"; }
+                } catch (e) { /* Fail open */ }
+            })();
+    </script>
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside class="w-72 bg-white dark:bg-[#181411] border-r border-slate-200 dark:border-slate-800 flex flex-col">
+            <div class="p-6 flex items-center gap-3">
+                <div class="size-10 rounded-full bg-primary flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined">car_repair</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold">RESQ Kerala</h1>
+                    <p class="text-xs text-slate-500">Emergency Support</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-2 space-y-1">
+                <a href="user_dash.html"
+                    class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+                    <span class="material-symbols-outlined">dashboard</span> Dashboard
+                </a>
+
+                <a href="service_history.html"
+                    class="flex items-center gap-3 px-4 py-3 bg-primary text-white rounded shadow-lg">
+                    <span class="material-symbols-outlined">history</span> Request History
+                </a>
+
+                <a href="my_vehicles.html"
+                    class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+                    <span class="material-symbols-outlined">directions_car</span> My Vehicles
+                </a>
+
+                <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+                    <a href="settings.html"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+                        <span class="material-symbols-outlined">settings</span> Settings
+                    </a>
+                </div>
+            </nav>
+
+            <!-- USER PROFILE -->
+            <div class="p-4 mt-auto">
+                <button onclick="logout()"
+                    class="w-full bg-slate-50 dark:bg-[#27211b] p-4 rounded-xl flex items-center gap-3 border border-slate-200 dark:border-slate-800 hover:bg-red-500/10 transition group">
+                    <div id="sideProfilePhoto"
+                        class="size-10 rounded-full bg-primary text-white flex items-center justify-center overflow-hidden">
+                        U</div>
+                    <div class="text-left">
+                        <p id="userName" class="text-sm font-semibold text-slate-900 dark:text-white">User</p>
+                        <p class="text-xs text-slate-500 group-hover:text-red-400">Logout</p>
+                    </div>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <div class="max-w-6xl mx-auto">
+
+                <header class="mb-8 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-4xl font-black">Service History</h2>
+                        <p class="text-slate-500">Your past breakdown assistance requests in Kerala.</p>
+                    </div>
+                </header>
+
+                <!-- TABLE -->
+                <div
+                    class="bg-white dark:bg-[#181411] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 dark:bg-[#27211b]">
+                                <tr>
+                                    <th class="px-6 py-4">Date</th>
+                                    <th class="px-6 py-4">District</th>
+                                    <th class="px-6 py-4">Mechanic</th>
+                                    <th class="px-6 py-4">Cost</th>
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="historyBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <!-- Dynamic rows will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        const phone = localStorage.getItem("phone");
+
+        async function init() {
+            loadProfile();
+            fetchHistory();
+        }
+
+        async function loadProfile() {
+            try {
+                const response = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById("userName").innerText = user.name || "User";
+                    if (user.profilePhoto) {
+                        const photoUrl = `http://localhost:5001/${user.profilePhoto.replace(/\\/g, '/')}`;
+                        document.getElementById("sideProfilePhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
+                    }
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function fetchHistory() {
+            try {
+                const res = await fetch(`http://localhost:5001/api/requests/history/user/${phone}`);
+                const history = await res.json();
+
+                const tbody = document.getElementById("historyBody");
+                tbody.innerHTML = "";
+
+                if (history.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">No requests found.</td></tr>`;
+                    return;
+                }
+
+                history.forEach(req => {
+                    const date = new Date(req.createdAt).toLocaleDateString('en-IN', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                    });
+
+                    const statusColor = {
+                        'Pending': 'text-yellow-500',
+                        'Approved': 'text-blue-500',
+                        'Arrived': 'text-emerald-500',
+                        'Work Started': 'text-orange-500',
+                        'Completed': 'text-emerald-500',
+                        'Rejected': 'text-red-500'
+                    }[req.status] || 'text-slate-500';
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                            <td class="px-6 py-4 font-medium">${date}</td>
+                            <td class="px-6 py-4">${req.district || 'Kerala'}</td>
+                            <td class="px-6 py-4 text-slate-700 dark:text-slate-300 font-bold">${req.Mechanic ? req.Mechanic.name : 'Finding...'}</td>
+                            <td class="px-6 py-4">â‚¹${req.status === 'Completed' ? 'Pending settlement' : '0'}</td>
+                            <td class="px-6 py-4">
+                                <span class="${statusColor} font-black uppercase tracking-widest text-[10px]">${req.status}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="viewDetails('${req.id}', '${req.status}')" 
+                                    class="text-primary font-bold hover:underline">Track / Details</button>
+                            </td>
+                        `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) { console.error("History fetch error:", err); }
+        }
+
+        function viewDetails(id, status) {
+            localStorage.setItem("currentRequestId", id);
+            if (['Approved', 'Arrived', 'Work Started', 'Completed'].includes(status)) {
+                window.location.href = "mechanic_tracking.html";
+            } else {
+                window.location.href = "waiting.html";
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        init();
+    </script>
+
+</body>
+
+</html>
+

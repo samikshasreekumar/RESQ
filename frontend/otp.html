@@ -1,0 +1,326 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OTP Verification - RESQ Kerala</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#f27f0d",
+            "background-light": "#f8f7f5",
+            "background-dark": "#181411",
+          },
+          fontFamily: {
+            display: ["Lexend", "sans-serif"]
+          },
+          animation: {
+            'pop': 'pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+            'pulse-slow': 'pulseSlow 3s infinite',
+          },
+          keyframes: {
+            pop: {
+              '0%': { transform: 'scale(0.8)', opacity: '0' },
+              '100%': { transform: 'scale(1)', opacity: '1' },
+            },
+            pulseSlow: {
+              '0%, 100%': { transform: 'scale(1)', opacity: '0.1' },
+              '50%': { transform: 'scale(1.1)', opacity: '0.2' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .otp-input {
+      width: 3rem;
+      height: 3.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      border: 2px solid #cbd5e1;
+      border-radius: 0.75rem;
+      background: transparent;
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .dark .otp-input {
+      border-color: #3f3f46;
+      background-color: #1f1a15;
+    }
+
+    .otp-input:focus {
+      outline: none;
+      border-color: #f27f0d;
+      box-shadow: 0 0 0 2px rgba(242, 127, 13, 0.2);
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-6px);
+      }
+
+      75% {
+        transform: translateX(6px);
+      }
+    }
+
+    .shake {
+      animation: shake 0.35s;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-background-light dark:bg-background-dark font-display min-h-screen flex items-center justify-center p-4 relative overflow-hidden text-white">
+
+  <!-- Decorative background elements -->
+  <div
+    class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none -z-10 animate-pulse-slow">
+  </div>
+
+  <div id="otpCard"
+    class="bg-white dark:bg-[#27211b] p-8 rounded-xl shadow-2xl w-full max-w-sm border border-white/5 animate-pop opacity-0 duration-500">
+
+    <h1 class="text-3xl font-extrabold text-center text-primary mb-2">Verify OTP</h1>
+    <p class="text-center text-black dark:text-white/60 mb-8">
+      Enter the 6-digit OTP sent to your mobile
+    </p>
+
+    <div class="flex justify-between gap-2 mb-6 text-black dark:text-white">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+    </div>
+
+    <p id="timerText" class="text-center text-sm font-medium text-black dark:text-white/60 mb-6 mt-6">
+      Resend OTP in <span id="time" class="text-primary font-bold">30</span>s
+    </p>
+
+    <button id="resendBtn" onclick="resendOTP()" disabled
+      class="w-full h-12 mb-4 rounded-xl border border-primary text-primary font-bold hover:bg-primary/10 transition disabled:opacity-50 disabled:hover:bg-transparent">
+      Resend OTP
+    </button>
+
+    <button onclick="verifyOTP()"
+      class="w-full h-14 bg-primary text-white text-lg font-bold rounded-xl hover:opacity-90 transition shadow-lg shadow-orange-500/20">
+      Verify & Continue
+    </button>
+
+    <div id="recaptcha-container"></div>
+
+  </div>
+
+  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io("http://localhost:5001");
+    const phone = sessionStorage.getItem("otp_phone") || localStorage.getItem("phone");
+    const role = sessionStorage.getItem("otp_role") || localStorage.getItem("role");
+
+    if (!phone) {
+      alert("Session expired. Please login again.");
+      location.href = "index.html";
+    }
+
+    /* OTP INPUT HANDLING */
+    const otpInputs = document.querySelectorAll(".otp-input");
+    const otpCard = document.getElementById("otpCard");
+    let verifying = false;
+
+    otpInputs.forEach((input, i) => {
+      input.addEventListener("input", () => {
+        input.value = input.value.replace(/\D/g, "");
+        if (input.value && i < otpInputs.length - 1)
+          otpInputs[i + 1].focus();
+      });
+
+      input.addEventListener("keydown", e => {
+        if (e.key === "Backspace" && !input.value && i > 0)
+          otpInputs[i - 1].focus();
+      });
+    });
+
+    /* âœ… VERIFY OTP */
+    function verifyOTP() {
+      const verifyButton = document.querySelector('button[onclick="verifyOTP()"]');
+      verifyButton.disabled = true;
+      verifyButton.innerText = "Verifying...";
+
+      let otp = "";
+      otpInputs.forEach(i => otp += i.value);
+
+      console.log("verifyOTP called with OTP:", otp);
+
+      if (otp.length !== 6) {
+        alert("Please enter all 6 digits.");
+        verifyButton.disabled = false;
+        verifyButton.innerText = "Verify & Continue";
+        return;
+      }
+
+      console.log("Emitting verify_otp directly to socket:", socket.id);
+      socket.emit("verify_otp", { phone, otp, role });
+      
+      // Auto-unlock button after 5 seconds just in case of silent network failure
+      setTimeout(() => {
+          verifyButton.disabled = false;
+          verifyButton.innerText = "Verify & Continue";
+      }, 5000);
+    }
+
+    socket.on("otp_verified", (data) => {
+      console.log("OTP Verified successfully!");
+      alert("Login Successful ðŸŽ‰");
+
+      if (data.user.role === 'user') {
+        localStorage.setItem("u_phone", data.user.phone);
+        localStorage.setItem("u_role", "user");
+      } else if (data.user.role === 'mechanic') {
+        localStorage.setItem("m_phone", data.user.phone);
+        localStorage.setItem("m_role", "mechanic");
+      }
+      localStorage.setItem("phone", data.user.phone);
+      localStorage.setItem("role", data.user.role);
+      if (data.user.name) localStorage.setItem("username", data.user.name);
+
+      sessionStorage.removeItem("otp_phone");
+      sessionStorage.removeItem("otp_role");
+
+      location.href = data.user.redirect;
+    });
+
+    socket.on("otp_error", (data) => {
+      console.error("Server returned OTP Error:", data);
+      otpCard.classList.add("shake");
+      setTimeout(() => otpCard.classList.remove("shake"), 400);
+      otpInputs.forEach(i => i.value = "");
+      otpInputs[0].focus();
+      
+      const verifyButton = document.querySelector('button[onclick="verifyOTP()"]');
+      verifyButton.disabled = false;
+      verifyButton.innerText = "Verify & Continue";
+      
+      alert(data.message || "Invalid OTP âŒ");
+    });
+
+    /* â± RESEND TIMER */
+    let timer = 30;
+    const resendBtn = document.getElementById("resendBtn");
+    const timerText = document.getElementById("timerText");
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      
+      resendBtn.disabled = true;
+      resendBtn.classList.add("opacity-50");
+      timer = 30;
+      
+      timerText.innerHTML = `Resend OTP in <span id="time" class="text-primary font-bold">${timer}</span>s`;
+
+      timerInterval = setInterval(() => {
+        timer--;
+        const timeEl = document.getElementById("time");
+        if (timeEl) timeEl.innerText = timer;
+
+        if (timer <= 0) {
+          clearInterval(timerInterval);
+          resendBtn.disabled = false;
+          resendBtn.classList.remove("opacity-50");
+          timerText.innerText = "Didn't receive OTP?";
+        }
+      }, 1000);
+    }
+
+    /* ðŸ” RESEND OTP */
+    function resendOTP() {
+      console.log("resendOTP called, emitting request_otp");
+      socket.emit("request_otp", { phone });
+    }
+
+    /* ðŸ“± FAKE SMS NOTIFICATION FEATURE */
+    function showFakeSMS(otp) {
+      // Create notification element
+      const notif = document.createElement("div");
+      notif.className = "fixed top-0 left-1/2 -translate-x-1/2 mt-4 z-[999] w-[90%] max-w-sm bg-white/95 dark:bg-[#1a1c1d]/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-black/5 dark:border-white/10 p-4 transform -translate-y-full transition-all duration-500 ease-[cubic-bezier(0.2,1.2,0.3,1)]";
+      
+      notif.innerHTML = `
+        <div class="flex items-start gap-4 cursor-pointer" onclick="this.parentElement.remove()">
+          <div class="flex-shrink-0 size-12 rounded-2xl bg-gradient-to-tr from-green-400 to-emerald-500 flex items-center justify-center text-white shadow-inner">
+            <span class="material-symbols-outlined text-2xl animate-pulse">chat</span>
+          </div>
+          <div class="flex-1 w-full">
+            <div class="flex justify-between items-baseline mb-1">
+              <h4 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px] opacity-80">Messages â€¢ Now</h4>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden">RESQ</span>
+            </div>
+            <p class="text-base font-black text-slate-900 dark:text-white leading-tight mb-1">RESQ Kerala</p>
+            <p class="text-sm text-slate-600 dark:text-slate-300 font-medium">Your login OTP is <span class="font-black text-primary">${otp}</span>. Do not share this with anyone.</p>
+          </div>
+        </div>
+        <div class="absolute bottom-1 right-1/2 translate-x-1/2 w-12 h-1 bg-black/10 dark:bg-white/10 rounded-full mt-3"></div>
+      `;
+
+      document.body.appendChild(notif);
+
+      // Slide in
+      requestAnimationFrame(() => {
+        notif.style.transform = 'translate(-50%, 0)';
+      });
+
+      // Vibrate slightly if testing on mobile
+      if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+      // Pop down after 8 seconds
+      setTimeout(() => {
+        if(document.body.contains(notif)) {
+          notif.style.transform = 'translate(-50%, -150%)';
+          setTimeout(() => notif.remove(), 500);
+        }
+      }, 8000);
+    }
+
+    // Check on Initial Load if coming from index.html
+    const pendingOtp = sessionStorage.getItem("pending_test_otp");
+    if(pendingOtp) {
+      setTimeout(() => showFakeSMS(pendingOtp), 600); // slight delay makes it feel real
+      sessionStorage.removeItem("pending_test_otp");
+    }
+
+    socket.on("otp_sent", (data) => {
+      console.log("Server responded with otp_sent", data);
+      startTimer();
+      otpInputs.forEach(i => i.value = "");
+      otpInputs[0].focus();
+      if (data.testOtp) {
+        showFakeSMS(data.testOtp);
+      }
+    });
+
+    startTimer();
+  </script>
+
+</body>
+
+</html>

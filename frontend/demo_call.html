@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RESQ — Call Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,700,1,0" rel="stylesheet">
+  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #00e676;
+      --green-dark: #00b248;
+      --red: #ff1744;
+      --red-dark: #c4001d;
+      --orange: #ff6d00;
+      --bg: #080c10;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    /* ── Animated mesh background ── */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,230,118,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 80% 90%, rgba(255,109,0,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(0,150,255,0.04) 0%, transparent 70%);
+      animation: meshShift 12s ease-in-out infinite alternate;
+    }
+    @keyframes meshShift {
+      0%   { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(30deg); }
+    }
+
+    /* ── Floating orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      animation: floatOrb linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .orb-1 { width:400px; height:400px; background:#00e676; top:-100px; left:-120px; animation-duration:18s; }
+    .orb-2 { width:300px; height:300px; background:#ff6d00; bottom:-80px; right:-80px; animation-duration:14s; animation-delay:-5s; }
+    .orb-3 { width:200px; height:200px; background:#00cfff; top:40%; left:60%; animation-duration:22s; animation-delay:-9s; }
+    @keyframes floatOrb {
+      0%   { transform: translate(0,0) scale(1); }
+      33%  { transform: translate(40px,-30px) scale(1.1); }
+      66%  { transform: translate(-30px,20px) scale(0.95); }
+      100% { transform: translate(0,0) scale(1); }
+    }
+
+    /* ── Grid overlay ── */
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    }
+
+    /* ── Content wrapper ── */
+    .content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 24px;
+    }
+
+    /* ── Logo / Header ── */
+    .logo-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      padding: 8px 20px;
+      backdrop-filter: blur(10px);
+    }
+    .logo-badge span { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+    .logo-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse-dot 2s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+    .page-title {
+      text-align: center;
+    }
+    .page-title h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.5) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .page-title p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.35);
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    /* ── Trigger button ── */
+    .trigger-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 40px;
+      background: linear-gradient(135deg, #00c853, #00e676);
+      border: none;
+      border-radius: 100px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: #000;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 32px rgba(0,230,118,0.4), 0 0 0 0 rgba(0,230,118,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: btn-glow 3s ease-in-out infinite;
+    }
+    .trigger-btn:hover { transform: scale(1.05); }
+    .trigger-btn:active { transform: scale(0.97); }
+    .trigger-btn .material-symbols-rounded { font-size: 22px; }
+    @keyframes btn-glow {
+      0%,100% { box-shadow: 0 8px 32px rgba(0,230,118,0.4), 0 0 0 0px rgba(0,230,118,0.3); }
+      50%      { box-shadow: 0 8px 40px rgba(0,230,118,0.6), 0 0 0 14px rgba(0,230,118,0); }
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 320px;
+    }
+    .divider hr { flex:1; border:none; border-top: 1px solid rgba(255,255,255,0.08); }
+    .divider span { font-size: 11px; color: rgba(255,255,255,0.2); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+
+
+    /* ══════════════════════════════════════════
+       CALL POPUP OVERLAY
+    ══════════════════════════════════════════ */
+    #callOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    #callOverlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Card ── */
+    .call-card {
+      position: relative;
+      width: 360px;
+      max-width: 100%;
+      background: linear-gradient(160deg, #0d1f14 0%, #091510 100%);
+      border: 1px solid rgba(0,230,118,0.25);
+      border-radius: 36px;
+      padding: 48px 36px 36px;
+      text-align: center;
+      box-shadow:
+        0 0 0 1px rgba(0,230,118,0.08),
+        0 40px 80px rgba(0,0,0,0.6),
+        0 0 80px rgba(0,230,118,0.1);
+      overflow: hidden;
+      transform: scale(0.85) translateY(30px);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s;
+    }
+    #callOverlay.visible .call-card {
+      transform: scale(1) translateY(0);
+    }
+
+    /* shimmer stripe at top */
+    .call-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+      animation: shimmer 3s linear infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ── Ripple rings around avatar ── */
+    .avatar-wrap {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 28px;
+    }
+    .ripple-ring {
+      position: absolute;
+      inset: -14px;
+      border-radius: 50%;
+      border: 2px solid var(--green);
+      opacity: 0;
+      animation: ripple 2.4s ease-out infinite;
+    }
+    .ripple-ring:nth-child(2) { animation-delay: 0.8s; }
+    .ripple-ring:nth-child(3) { animation-delay: 1.6s; }
+    @keyframes ripple {
+      0%   { transform: scale(0.8); opacity: 0.6; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .avatar {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, rgba(0,230,118,0.25), rgba(0,178,90,0.1));
+      border: 2px solid rgba(0,230,118,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px rgba(0,230,118,0.3), inset 0 0 20px rgba(0,230,118,0.05);
+      z-index: 1;
+    }
+    .avatar .material-symbols-rounded {
+      font-size: 44px;
+      color: var(--green);
+      animation: icon-bounce 1s ease-in-out infinite alternate;
+    }
+    @keyframes icon-bounce {
+      0%   { transform: scale(1) rotate(-5deg); }
+      100% { transform: scale(1.1) rotate(5deg); }
+    }
+
+    /* ── Status tag ── */
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,230,118,0.08);
+      border: 1px solid rgba(0,230,118,0.2);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 12px;
+    }
+    .status-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse-dot 1s infinite;
+    }
+
+    /* ── Caller info ── */
+    .caller-name {
+      font-size: 30px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .caller-phone {
+      font-size: 16px;
+      font-weight: 600;
+      color: rgba(255,130,0,0.85);
+      letter-spacing: 2px;
+      margin-bottom: 0;
+    }
+
+    /* ── Waveform decoration ── */
+    .waveform {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 32px;
+      margin: 20px 0;
+    }
+    .wave-bar {
+      width: 4px;
+      border-radius: 4px;
+      background: linear-gradient(to top, rgba(0,230,118,0.3), rgba(0,230,118,0.8));
+      animation: wave 1.2s ease-in-out infinite alternate;
+    }
+    .wave-bar:nth-child(1)  { height:10px; animation-delay:0s;    }
+    .wave-bar:nth-child(2)  { height:22px; animation-delay:0.1s;  }
+    .wave-bar:nth-child(3)  { height:16px; animation-delay:0.2s;  }
+    .wave-bar:nth-child(4)  { height:28px; animation-delay:0.3s;  }
+    .wave-bar:nth-child(5)  { height:12px; animation-delay:0.4s;  }
+    .wave-bar:nth-child(6)  { height:20px; animation-delay:0.5s;  }
+    .wave-bar:nth-child(7)  { height:26px; animation-delay:0.6s;  }
+    .wave-bar:nth-child(8)  { height:14px; animation-delay:0.7s;  }
+    .wave-bar:nth-child(9)  { height:18px; animation-delay:0.8s;  }
+    .wave-bar:nth-child(10) { height:10px; animation-delay:0.9s;  }
+    @keyframes wave {
+      0%   { transform: scaleY(0.5); opacity: 0.4; }
+      100% { transform: scaleY(1.5); opacity: 1; }
+    }
+
+    /* ── Action buttons ── */
+    .btn-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 4px;
+    }
+    .btn-action {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      transition: transform 0.15s;
+    }
+    .btn-action:active { transform: scale(0.92); }
+
+    .btn-circle {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .btn-circle:hover { transform: scale(1.1); }
+
+    .btn-decline .btn-circle {
+      background: linear-gradient(145deg, #ff1744, #c4001d);
+      box-shadow: 0 8px 24px rgba(255,23,68,0.5);
+    }
+    .btn-decline .btn-circle:hover { box-shadow: 0 12px 32px rgba(255,23,68,0.7); }
+    .btn-decline span.label { font-size: 12px; font-weight: 700; color: rgba(255,100,100,0.8); }
+
+    .btn-answer .btn-circle {
+      background: linear-gradient(145deg, #00e676, #00b248);
+      box-shadow: 0 8px 24px rgba(0,230,118,0.5);
+      animation: answer-glow 2s ease-in-out infinite;
+    }
+    .btn-answer .btn-circle:hover { box-shadow: 0 12px 36px rgba(0,230,118,0.7); }
+    .btn-answer span.label { font-size: 12px; font-weight: 700; color: rgba(100,255,150,0.8); }
+    @keyframes answer-glow {
+      0%,100% { box-shadow: 0 8px 24px rgba(0,230,118,0.5); }
+      50%      { box-shadow: 0 8px 40px rgba(0,230,118,0.8), 0 0 0 10px rgba(0,230,118,0.1); }
+    }
+
+    .btn-circle .material-symbols-rounded {
+      font-size: 30px;
+      color: #fff;
+    }
+
+
+    /* ══════════════════════════════════════════
+       ANSWER STATE
+    ══════════════════════════════════════════ */
+    .answered-card {
+      background: linear-gradient(160deg, #0a1f14 0%, #061410 100%);
+      border-color: rgba(0,230,118,0.5);
+      box-shadow:
+        0 0 0 1px rgba(0,230,118,0.15),
+        0 40px 80px rgba(0,0,0,0.6),
+        0 0 120px rgba(0,230,118,0.2);
+    }
+
+    .success-icon-wrap {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,230,118,0.25) 0%, transparent 70%);
+      border: 2px solid rgba(0,230,118,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 40px rgba(0,230,118,0.3);
+      animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    .success-icon-wrap .material-symbols-rounded {
+      font-size: 44px;
+      color: var(--green);
+    }
+    @keyframes pop-in {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .accepted-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 8px;
+      animation: fadeUp 0.4s 0.2s both;
+    }
+
+    .on-way-box {
+      background: rgba(0,230,118,0.06);
+      border: 1px solid rgba(0,230,118,0.2);
+      border-radius: 20px;
+      padding: 20px 24px;
+      margin: 12px 0 24px;
+      animation: fadeUp 0.4s 0.35s both;
+    }
+    .on-way-emoji { font-size: 32px; margin-bottom: 8px; }
+    .on-way-text {
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.5px;
+      line-height: 1.3;
+    }
+    .on-way-sub {
+      font-size: 12px;
+      color: rgba(0,230,118,0.6);
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    .close-btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, rgba(0,230,118,0.15), rgba(0,178,72,0.25));
+      border: 1px solid rgba(0,230,118,0.3);
+      color: var(--green);
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      animation: fadeUp 0.4s 0.5s both;
+    }
+    .close-btn:hover { background: linear-gradient(135deg, rgba(0,230,118,0.25), rgba(0,178,72,0.35)); transform: translateY(-2px); }
+    .close-btn:active { transform: scale(0.97); }
+
+
+    /* ══════════════════════════════════════════
+       DECLINE STATE
+    ══════════════════════════════════════════ */
+    .declined-card {
+      background: linear-gradient(160deg, #1a0808 0%, #100505 100%);
+      border-color: rgba(255,23,68,0.4);
+      box-shadow:
+        0 0 0 1px rgba(255,23,68,0.1),
+        0 40px 80px rgba(0,0,0,0.6),
+        0 0 100px rgba(255,23,68,0.15);
+    }
+    .declined-card::before {
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+
+    .decline-icon-wrap {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,23,68,0.2) 0%, transparent 70%);
+      border: 2px solid rgba(255,23,68,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 40px rgba(255,23,68,0.25);
+      animation: pop-in 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .decline-icon-wrap .material-symbols-rounded {
+      font-size: 44px;
+      color: var(--red);
+    }
+
+    .declined-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      animation: fadeUp 0.4s 0.15s both;
+    }
+    .declined-sub {
+      font-size: 13px;
+      color: rgba(255,100,100,0.6);
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: fadeUp 0.4s 0.25s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(14px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-mesh"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Main Content -->
+  <div class="content">
+
+    <div class="logo-badge">
+      <div class="dot"></div>
+      <span>RESQ &nbsp;·&nbsp; Mechanic Portal</span>
+    </div>
+
+    <div class="page-title">
+      <h1>Incoming Call UI Demo</h1>
+      <p>Simulate a real-time incoming service call notification</p>
+    </div>
+
+    <button class="trigger-btn" onclick="triggerDemoCall()">
+      <span class="material-symbols-rounded">add_call</span>
+      Simulate Incoming Call
+    </button>
+
+    <div class="divider">
+      <hr>
+      <span>preview</span>
+      <hr>
+    </div>
+
+    <p style="font-size:12px; color:rgba(255,255,255,0.2); text-align:center; max-width:280px; line-height:1.7;">
+      In production, this popup appears automatically via Socket.io when a user makes a service request.
+    </p>
+
+  </div>
+
+  <!-- ══ Call Overlay ══ -->
+  <div id="callOverlay">
+    <div class="call-card" id="callCard">
+      <!-- Dynamically filled -->
+    </div>
+  </div>
+
+
+  <script>
+    const overlay = document.getElementById("callOverlay");
+    const card    = document.getElementById("callCard");
+
+    function triggerDemoCall() {
+      showCallRingingPopup("Arjun Kumar", "9876543210");
+    }
+
+    function showCallRingingPopup(name, phone) {
+      card.className = "call-card";
+      card.innerHTML = `
+        <div class="avatar-wrap">
+          <div class="ripple-ring"></div>
+          <div class="ripple-ring"></div>
+          <div class="ripple-ring"></div>
+          <div class="avatar">
+            <span class="material-symbols-rounded">call</span>
+          </div>
+        </div>
+
+        <div class="status-tag">Incoming Call</div>
+
+        <p class="caller-name">${name || 'Customer'}</p>
+        <p class="caller-phone">+91 &nbsp;${phone || ''}</p>
+
+        <div class="waveform">
+          ${Array.from({length:10}).map(()=>`<div class="wave-bar"></div>`).join('')}
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-action btn-decline" onclick="declineCall()">
+            <div class="btn-circle">
+              <span class="material-symbols-rounded">call_end</span>
+            </div>
+            <span class="label">Decline</span>
+          </button>
+          <button class="btn-action btn-answer" onclick="answerCall()">
+            <div class="btn-circle">
+              <span class="material-symbols-rounded">call</span>
+            </div>
+            <span class="label">Answer</span>
+          </button>
+        </div>
+      `;
+
+      overlay.classList.add("visible");
+      // Auto dismiss after 30s
+      autoTimer = setTimeout(() => closeOverlay(), 30000);
+    }
+
+    let autoTimer = null;
+
+    function closeOverlay() {
+      overlay.classList.remove("visible");
+      clearTimeout(autoTimer);
+    }
+
+    function answerCall() {
+      clearTimeout(autoTimer);
+      card.className = "call-card answered-card";
+      card.innerHTML = `
+        <div class="success-icon-wrap">
+          <span class="material-symbols-rounded">check_circle</span>
+        </div>
+
+        <p class="accepted-title">✅ Call Accepted</p>
+
+        <div class="on-way-box">
+          <div class="on-way-emoji">🏍️💨</div>
+          <p class="on-way-text">I am coming!<br>I am on the way!</p>
+          <p class="on-way-sub">Mechanic is en route</p>
+        </div>
+
+        <button class="close-btn" onclick="closeOverlay()">
+          Close
+        </button>
+      `;
+    }
+
+    function declineCall() {
+      clearTimeout(autoTimer);
+      card.className = "call-card declined-card";
+      card.innerHTML = `
+        <div class="decline-icon-wrap">
+          <span class="material-symbols-rounded">call_end</span>
+        </div>
+        <p class="declined-title">Call Declined</p>
+        <p class="declined-sub">The call has been ended</p>
+      `;
+      setTimeout(() => closeOverlay(), 2200);
+    }
+  </script>
+
+</body>
+</html>

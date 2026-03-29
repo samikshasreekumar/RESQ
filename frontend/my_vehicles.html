@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Vehicles - RESQ Kerala</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f27f0d",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221910",
+                    },
+                    fontFamily: { display: ["Lexend"] }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+
+    <!-- ðŸ”’ AUTH GUARD -->
+    <script>
+            (async () => {
+                const phone = localStorage.getItem("phone");
+                const role = localStorage.getItem("role");
+                if (!phone || role !== "user") { window.location.href = "index.html"; return; }
+                try {
+                    const res = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+                    if (!res.ok) { localStorage.clear(); window.location.href = "index.html"; }
+                } catch (e) { /* Fail open */ }
+            })();
+    </script>
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside class="w-72 bg-white dark:bg-[#181411] border-r border-slate-200 dark:border-slate-800 flex flex-col">
+            <div class="p-6 flex items-center gap-3">
+                <div class="size-10 rounded-full bg-primary flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined">car_repair</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold">RESQ Kerala</h1>
+                    <p class="text-xs text-slate-500">Emergency Support</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-2 space-y-1">
+                <a href="user_dash.html"
+                    class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+                    <span class="material-symbols-outlined">dashboard</span> Dashboard
+                </a>
+
+                <a href="service_history.html"
+                    class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+                    <span class="material-symbols-outlined">history</span> Request History
+                </a>
+
+                <a href="my_vehicles.html"
+                    class="flex items-center gap-3 px-4 py-3 bg-primary text-white rounded shadow-lg">
+                    <span class="material-symbols-outlined">directions_car</span> My Vehicles
+                </a>
+
+                <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+                    <a href="settings.html"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 hover:text-primary rounded">
+                        <span class="material-symbols-outlined">settings</span> Settings
+                    </a>
+                </div>
+            </nav>
+
+            <!-- USER PROFILE -->
+            <div class="p-4 mt-auto">
+                <button onclick="logout()"
+                    class="w-full bg-slate-50 dark:bg-[#27211b] p-4 rounded-xl flex items-center gap-3 border border-slate-200 dark:border-slate-800 hover:bg-red-500/10 transition group">
+                    <div id="sideProfilePhoto"
+                        class="size-10 rounded-full bg-primary text-white flex items-center justify-center overflow-hidden">
+                        U</div>
+                    <div class="text-left">
+                        <p id="userName" class="text-sm font-semibold text-slate-900 dark:text-white">User</p>
+                        <p class="text-xs text-slate-500 group-hover:text-red-400">Logout</p>
+                    </div>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <div class="max-w-6xl mx-auto">
+
+                <header class="mb-12 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-4xl font-black">My Vehicles</h2>
+                        <p class="text-slate-500">Manage your registered vehicles for quick assistance.</p>
+                    </div>
+                    <button onclick="window.location.href='add_newvehicle.html'"
+                        class="bg-primary text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition flex items-center gap-2">
+                        <span class="material-symbols-outlined">add</span>
+                        Add New Vehicle
+                    </button>
+                </header>
+
+                <div id="vehicleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Vehicles loaded via JS -->
+                    <div class="col-span-full py-20 text-center opacity-50">
+                        <p>Loading your vehicles...</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const phone = localStorage.getItem("phone");
+
+        async function loadData() {
+            try {
+                // Load Profile for sidebar
+                const profRes = await fetch(`http://localhost:5001/api/user/profile/${phone}`);
+                if (profRes.ok) {
+                    const user = await profRes.json();
+                    document.getElementById("userName").innerText = user.name || "User";
+                    if (user.profilePhoto) {
+                        const photoUrl = `http://localhost:5001/${user.profilePhoto.replace(/\\/g, '/')}`;
+                        document.getElementById("sideProfilePhoto").innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover">`;
+                    }
+                }
+
+                // Load Vehicles
+                const res = await fetch(`http://localhost:5001/api/vehicles/${phone}`);
+                if (res.ok) {
+                    const vehicles = await res.json();
+                    const grid = document.getElementById("vehicleGrid");
+
+                    if (vehicles.length === 0) {
+                        grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 bg-white/5 border border-dashed border-white/10 rounded-3xl">
+                        <span class="material-symbols-outlined text-6xl text-slate-600 mb-4">directions_car</span>
+                        <p class="text-slate-500 mb-6">No vehicles registered yet.</p>
+                        <button onclick="window.location.href='add_newvehicle.html'" class="bg-white/10 px-6 py-2 rounded-lg font-bold hover:bg-white/20 transition">Register Now</button>
+                    </div>
+                `;
+                        return;
+                    }
+
+                    grid.innerHTML = vehicles.map(v => `
+                <div class="bg-white dark:bg-[#181411] p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 group">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-3xl">
+                                ${v.type === 'Bike' ? 'moped' : v.type === 'Heavy' ? 'local_shipping' : 'directions_car'}
+                            </span>
+                        </div>
+                        <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] font-bold uppercase tracking-widest">${v.type}</span>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold mb-1">${v.model}</h3>
+                    <p class="text-slate-500 font-medium mb-4">${v.brand || 'Unknown Brand'}</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <div>
+                            <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">Plate Number</p>
+                            <p class="font-mono text-sm">${v.number}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">Color</p>
+                            <p class="text-sm font-semibold">${v.color || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        loadData();
+    </script>
+
+</body>
+
+</html>
+
