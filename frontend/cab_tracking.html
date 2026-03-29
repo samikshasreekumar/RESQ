@@ -190,7 +190,7 @@
         </div>
       </div>
 
-      <button onclick="window.location.href='mechanic_tracking.html'" 
+      <button onclick="window.location.href='user_dash.html'" 
         class="w-full h-16 bg-green-500 text-black font-black rounded-2xl shadow-xl shadow-green-500/30 hover:scale-105 active:scale-95 transition-all text-lg">
         Back to Dashboard
       </button>
@@ -233,117 +233,111 @@
   </div>
 
   <!-- —— MAIN LAYOUT —— -->
-  <div class="relative z-10 flex flex-col h-screen p-4 md:p-6 gap-4 overflow-hidden">
+  <div class="relative z-10 flex flex-col h-screen p-3 md:p-5 gap-3 overflow-hidden">
 
     <!-- Header -->
     <header class="flex items-center justify-between flex-shrink-0">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
         <button onclick="window.location.href='mechanic_tracking.html'"
-          class="size-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-          <span class="material-symbols-rounded text-white" style="font-size:20px;">arrow_back</span>
+          class="size-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
+          <span class="material-symbols-rounded text-white" style="font-size:18px;">arrow_back</span>
         </button>
         <div>
-          <p class="text-[10px] font-black uppercase tracking-widest text-yellow-400">Live Cab Tracking</p>
-          <h1 class="text-xl font-black text-white" id="pageTitle">Cab is on the way</h1>
+          <p class="text-[9px] font-black uppercase tracking-widest text-yellow-400">Live Cab Tracking</p>
+          <h1 class="text-lg font-black text-white" id="pageTitle">Cab is on the way</h1>
         </div>
       </div>
 
-      <div class="status-pill">
+      <div class="status-pill py-1 px-4">
         <span class="status-dot"></span>
-        <span class="text-xs font-black uppercase tracking-widest text-yellow-400" id="statusLabel">En Route</span>
+        <span class="text-[10px] font-black uppercase tracking-widest text-yellow-400" id="statusLabel">En Route</span>
       </div>
     </header>
 
     <!-- Body -->
-    <div class="flex flex-col lg:flex-row gap-4 flex-1 min-h-0">
+    <div class="flex flex-col lg:flex-row gap-3 flex-1 min-h-0">
 
       <!-- Map -->
-      <div class="flex-1 relative bg-white/5 border border-white/8 rounded-[28px] overflow-hidden min-h-[300px]">
+      <div class="flex-1 relative bg-white/5 border border-white/8 rounded-3xl overflow-hidden min-h-[250px]">
         <div id="map"></div>
 
-        <!-- Floating ETA bar -->
-        <div class="absolute bottom-5 left-5 right-5 z-[100] pointer-events-none">
-          <div class="bg-black/80 backdrop-blur-md border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-6 pointer-events-auto">
+        <!-- Floating ETA bar (Slimmer) -->
+        <div class="absolute bottom-4 left-4 right-4 z-[100] pointer-events-none">
+          <div class="bg-black/85 backdrop-blur-md border border-white/10 rounded-2xl px-5 py-3 flex items-center gap-5 pointer-events-auto shadow-2xl">
             <div>
-              <p class="text-[10px] font-black uppercase tracking-widest text-yellow-400/70 mb-1">ETA</p>
-              <p class="text-3xl font-black text-yellow-400"><span id="etaValue">--</span> <span class="text-sm text-white/40">min</span></p>
+              <p class="text-[9px] font-black uppercase tracking-widest text-yellow-400/70 mb-0.5">ETA</p>
+              <p class="text-2xl font-black text-yellow-400"><span id="etaValue">--</span> <span class="text-[10px] text-white/40">min</span></p>
             </div>
-            <div class="w-px h-10 bg-white/10"></div>
+            <div class="w-px h-8 bg-white/10"></div>
             <div>
-              <p class="text-[10px] font-black uppercase tracking-widest text-white/30 mb-1">Distance</p>
-              <p class="text-3xl font-black text-white"><span id="distValue">--</span> <span class="text-sm text-white/40">km</span></p>
+              <p class="text-[9px] font-black uppercase tracking-widest text-white/30 mb-0.5">Distance</p>
+              <p class="text-2xl font-black text-white"><span id="distValue">--</span> <span class="text-[10px] text-white/40">km</span></p>
             </div>
-            <div class="w-px h-10 bg-white/10"></div>
+            <div class="w-px h-8 bg-white/10"></div>
             <div class="flex-1">
-              <p class="text-[10px] font-black uppercase tracking-widest text-white/30 mb-1">Status</p>
-              <p class="text-base font-bold text-yellow-400" id="statusText">Heading to your location...</p>
+              <p class="text-[9px] font-black uppercase tracking-widest text-white/30 mb-0.5">Status</p>
+              <p class="text-xs font-bold text-yellow-400 leading-tight" id="statusText">Heading to your location...</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Right Panel -->
-      <div class="lg:w-[320px] flex flex-col gap-4 flex-shrink-0 overflow-y-auto pr-2 pb-4 style-scrollbar">
+      <!-- Right Panel (Compact) -->
+      <div class="lg:w-[280px] flex flex-col gap-3 flex-shrink-0 overflow-y-auto pr-1 pb-2 style-scrollbar">
 
         <!-- Driver Card -->
-        <div class="bg-gradient-to-b from-white/8 to-white/3 border border-white/10 rounded-[28px] p-6 text-center">
-          <div class="size-20 rounded-2xl bg-yellow-500/15 border-2 border-yellow-500/30 flex items-center justify-center mx-auto mb-4 text-4xl">
+        <div class="bg-gradient-to-b from-white/8 to-white/3 border border-white/10 rounded-3xl p-5 text-center">
+          <div class="size-16 rounded-2xl bg-yellow-500/15 border-2 border-yellow-500/30 flex items-center justify-center mx-auto mb-3 text-3xl">
             👨‍✈️
           </div>
-          <p class="text-[10px] font-black uppercase tracking-widest text-yellow-400 mb-1">Your Driver</p>
-          <h2 class="text-xl font-black text-white mb-1" id="driverName">Loading...</h2>
-          <p class="text-xs text-white/30 font-bold uppercase tracking-widest">RESQ Verified Cab</p>
+          <p class="text-[9px] font-black uppercase tracking-widest text-yellow-400 mb-0.5">Your Driver</p>
+          <h2 class="text-lg font-black text-white mb-0.5" id="driverName">Loading...</h2>
+          <p class="text-[10px] text-white/30 font-bold uppercase tracking-widest">RESQ Verified Cab</p>
 
-          <div class="mt-4 pt-4 border-t border-white/8 flex gap-2">
-            <div class="flex-1 info-card text-center p-3">
-              <p class="label">Rating</p>
-              <p class="value text-yellow-400" style="font-size:18px;">4.8 ⭐</p>
+          <div class="mt-3 pt-3 border-t border-white/8 flex gap-2">
+            <div class="flex-1 info-card text-center p-2 rounded-xl">
+              <p class="label" style="font-size:8px;">Rating</p>
+              <p class="value text-yellow-400" style="font-size:14px;">4.8 ⭐</p>
             </div>
-            <div class="flex-1 info-card text-center p-3">
-              <p class="label">Trips</p>
-              <p class="value" style="font-size:18px;">248</p>
+            <div class="flex-1 info-card text-center p-2 rounded-xl">
+              <p class="label" style="font-size:8px;">Trips</p>
+              <p class="value" style="font-size:14px;">248</p>
             </div>
           </div>
         </div>
 
         <!-- Info cards -->
-        <div class="grid grid-cols-2 gap-3">
-          <div class="info-card">
-            <p class="label">ETA</p>
-            <p class="value"><span id="etaCard">--</span> <span class="unit">min</span></p>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="info-card p-3 rounded-xl">
+            <p class="label" style="font-size:8px;">ETA</p>
+            <p class="value" style="font-size:16px;"><span id="etaCard">--</span> <span class="unit" style="font-size:10px;">min</span></p>
           </div>
-          <div class="info-card">
-            <p class="label">Distance</p>
-            <p class="value"><span id="distCard">--</span> <span class="unit">km</span></p>
+          <div class="info-card p-3 rounded-xl">
+            <p class="label" style="font-size:8px;">Distance</p>
+            <p class="value" style="font-size:16px;"><span id="distCard">--</span> <span class="unit" style="font-size:10px;">km</span></p>
           </div>
         </div>
 
-        <!-- Destination Input -->
-        <div class="bg-blue-500/10 border border-blue-500/20 rounded-[24px] p-5">
-          <p class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-2">📍 Set Drop Location</p>
+        <!-- Destination (Slimmer) -->
+        <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4">
+          <p class="text-[9px] font-black uppercase tracking-widest text-blue-400 mb-2">📍 Set Drop Location</p>
           <div class="flex gap-2">
-            <input type="text" id="dropLocationInput" placeholder="Enter safe location..." 
-              class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-            <button onclick="setDropLocation()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs font-bold rounded-xl transition">Set</button>
+            <input type="text" id="dropLocationInput" placeholder="Location..." 
+              class="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
+            <button onclick="setDropLocation()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-[10px] font-black uppercase rounded-lg transition">Set</button>
           </div>
         </div>
 
         <!-- Journey Controls -->
-        <div class="bg-white/5 border border-white/10 rounded-[28px] p-5 flex flex-col gap-3">
-          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1 text-center">Trip Timeline Controls</p>
+        <div class="bg-white/5 border border-white/10 rounded-3xl p-4 flex flex-col gap-2">
+          <p class="text-[9px] font-black uppercase tracking-widest text-white/40 mb-1 text-center">Journey Timeline</p>
           
           <button onclick="userNotifyCabPickup()" id="btnPickup" 
-            class="w-full py-3 rounded-2xl bg-blue-500/10 border border-blue-500/40 text-blue-400 hover:bg-blue-500 hover:text-white font-black text-sm transition flex items-center justify-center gap-2">
-            🚶 I am Picked Up
+            class="w-full py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/40 text-blue-400 hover:bg-blue-500 hover:text-white font-black text-[11px] transition flex items-center justify-center gap-2">
+            🚶 Picked Up
           </button>
           
           <button onclick="userNotifyCabDropoff()" id="btnDropoff"
-            class="w-full py-3 rounded-2xl bg-green-500/10 border border-green-500/40 text-green-400 hover:bg-green-500 hover:text-white font-black text-sm transition flex items-center justify-center gap-2">
-            🏡 Safely Dropped Off
-          </button>
-        </div>
-
-        <!-- Back button -->
         <button onclick="window.location.href='mechanic_tracking.html'"
           class="w-full py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/50 font-bold text-sm transition">
           ← Back to Mechanic Tracking
@@ -576,7 +570,9 @@
       document.getElementById("btnDropoff").style.opacity = "0.5";
       document.getElementById("btnDropoff").disabled = true;
       document.getElementById("btnDropoff").innerText = "✅ Dropped Off";
-      alert("Trip completed securely.");
+      localStorage.setItem(`cabDroppedOff_${currentRequestId}`, "true");
+      alert("Trip completed securely. You are back home.");
+      window.location.href = "user_dash.html";
     }
 
     init();

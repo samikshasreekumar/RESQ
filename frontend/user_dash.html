@@ -122,15 +122,15 @@
         <div id="activeRequestBanner"
           class="hidden mb-12 bg-orange-500/10 border border-orange-500/30 p-6 rounded-3xl flex justify-between items-center animate-pulse">
           <div class="flex items-center gap-4">
-            <div class="size-12 rounded-full bg-orange-500 flex items-center justify-center text-white">
+            <div id="bannerIcon" class="size-12 rounded-full bg-orange-500 flex items-center justify-center text-white">
               <span class="material-symbols-outlined">timer</span>
             </div>
             <div>
-              <p class="text-orange-500 font-black text-lg">Active Service in Progress</p>
-              <p class="text-sm text-gray-400">Track your mechanic's arrival in real-time</p>
+              <p id="bannerTitle" class="text-orange-500 font-black text-lg">Active Service in Progress</p>
+              <p id="bannerSub" class="text-sm text-gray-400">Track your mechanic's arrival in real-time</p>
             </div>
           </div>
-          <button onclick="window.location.href='mechanic_tracking.html'"
+          <button id="bannerBtn" onclick="window.location.href='mechanic_tracking.html'"
             class="bg-orange-500 text-white px-8 py-3 rounded-2xl text-sm font-black shadow-lg shadow-orange-500/30 hover:scale-110 transition active:scale-95">
             Live Tracking
           </button>
@@ -318,10 +318,34 @@
         const response = await fetch(`${BACKEND_URL}/api/requests/${requestId}`);
         if (response.ok) {
           const data = await response.json();
-          if (['Pending', 'Approved', 'Arrived', 'Work Started'].includes(data.request.status)) {
-            document.getElementById("activeRequestBanner").classList.remove("hidden");
+          const req = data.request;
+          const status = req.status;
+          const banner = document.getElementById("activeRequestBanner");
+          const title = document.getElementById("bannerTitle");
+          const sub = document.getElementById("bannerSub");
+          const btn = document.getElementById("bannerBtn");
+
+          if (['Pending', 'Approved', 'Arrived', 'Work Started', 'Completed'].includes(status)) {
+            banner.classList.remove("hidden");
+            
+            if (status === 'Work Started') {
+               title.innerText = "Vehicle Repair in Progress";
+               title.className = "text-blue-500 font-black text-lg";
+               sub.innerText = "Your professional is working on your vehicle.";
+               btn.innerText = "View Details";
+               btn.className = "bg-blue-600 text-white px-8 py-3 rounded-2xl text-sm font-black shadow-lg shadow-blue-500/30 hover:scale-110 transition active:scale-95";
+               banner.className = "mb-12 bg-blue-500/10 border border-blue-500/30 p-6 rounded-3xl flex justify-between items-center animate-pulse";
+            } else if (status === 'Completed') {
+               title.innerText = "Repair Completed! ✅";
+               title.className = "text-green-500 font-black text-lg";
+               sub.innerText = "Your vehicle is ready. Please check the final report.";
+               btn.innerText = "Finalize Service";
+               btn.className = "bg-green-600 text-white px-8 py-3 rounded-2xl text-sm font-black shadow-lg shadow-green-500/30 hover:scale-110 transition active:scale-95";
+               banner.className = "mb-12 bg-green-500/10 border border-green-500/30 p-6 rounded-3xl flex justify-between items-center";
+               banner.classList.remove("animate-pulse"); // Stop pulsing when done
+            }
           } else {
-            document.getElementById("activeRequestBanner").classList.add("hidden");
+            banner.classList.add("hidden");
             localStorage.removeItem("currentRequestId");
             localStorage.removeItem("requestStatus");
           }
@@ -365,21 +389,22 @@
       if (!container) {
         container = document.createElement("div");
         container.id = "toast-container";
-        // Fixed positioning moved from individual alerts to container
         container.className = "fixed top-8 right-8 flex flex-col items-end gap-2 z-[100]";
         document.body.appendChild(container);
       }
 
       const alertDiv = document.createElement("div");
-      // Removed 'fixed top-8 right-8' to allow flex column stacking
-      alertDiv.className = "bg-primary text-white p-6 rounded-3xl shadow-2xl z-[100] animate-in slide-in-from-right duration-500 flex items-center gap-4 border border-white/20";
+      const isCompleted = status.toLowerCase() === 'completed';
+      
+      alertDiv.className = `${isCompleted ? 'bg-green-600' : 'bg-primary'} text-white p-6 rounded-3xl shadow-2xl z-[100] animate-in slide-in-from-right duration-500 flex items-center gap-4 border border-white/20`;
+      
       alertDiv.innerHTML = `
         <div class="size-12 rounded-full bg-white/20 flex items-center justify-center">
-          <span class="material-symbols-outlined">notifications_active</span>
+          <span class="material-symbols-outlined">${isCompleted ? 'verified' : 'notifications_active'}</span>
         </div>
         <div>
           <p class="text-[10px] font-black uppercase tracking-widest opacity-60">Status Update</p>
-          <p class="font-bold text-lg">Your request is now: <span class="capitalize">${status}</span></p>
+          <p class="font-bold text-lg">${isCompleted ? 'Your vehicle is ready!' : 'Your request is now: ' + '<span class="capitalize">' + status + '</span>'}</p>
         </div>
       `;
       container.appendChild(alertDiv);

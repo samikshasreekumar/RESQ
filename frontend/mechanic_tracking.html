@@ -39,11 +39,7 @@
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
 
-    #map {
-      height: 100%;
-      border-radius: 32px;
-      z-index: 1;
-    }
+    #map { height: 400px; border-radius: 32px; z-index: 1; }
 
     .pulse {
       width: 24px;
@@ -247,8 +243,8 @@
   <div class="flex h-screen overflow-hidden">
 
     <!-- SIDEBAR -->
-    <aside class="w-72 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 flex flex-col">
-      <div class="p-6 flex items-center gap-3">
+    <aside class="w-64 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 flex flex-col">
+      <div class="p-4 flex items-center gap-3">
         <div class="size-10 rounded-full bg-primary flex items-center justify-center text-white">
           <span class="material-symbols-outlined">car_repair</span>
         </div>
@@ -291,123 +287,114 @@
           </div>
         </button>
       </div>
-    </aside>
-
     <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col h-full grow p-8 gap-8">
+    <main class="flex-1 flex flex-col h-full grow p-6 gap-6 overflow-y-auto style-scrollbar">
 
-      <header class="flex justify-between items-end">
-        <div>
-          <h2 class="text-xs uppercase tracking-widest font-black text-primary mb-2">Live Tracking</h2>
-          <h1 class="text-4xl font-extrabold" id="mainMessage">Professional is on the way</h1>
+      <header class="flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-primary mb-0.5">Live Tracking</p>
+            <h1 class="text-2xl font-black text-slate-900 dark:text-white" id="mainMessage">Mechanic is on the way</h1>
+          </div>
+          <div class="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+             <div id="statusDot" class="size-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+             <span id="statusBadge" class="text-[10px] font-black uppercase tracking-widest text-emerald-500">En Route</span>
+          </div>
         </div>
-        <div class="flex gap-4">
-          <div id="cabInfoCard"
-            class="hidden bg-emerald-500/10 px-6 py-3 rounded-2xl border border-emerald-500/30 flex items-center gap-4">
-            <span class="material-symbols-outlined text-emerald-500 text-3xl">local_taxi</span>
+
+        <!-- Compact Cab Info -->
+        <div id="cabInfoCard" class="hidden flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 px-4 py-2.5 rounded-2xl shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-500 text-2xl">local_taxi</span>
             <div>
-              <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Cab Arranged</p>
-              <p id="cabDriverDisplay" class="text-sm font-bold text-white">Driver: —</p>
+              <p class="text-[9px] font-black uppercase tracking-widest text-emerald-400">Cab Arranged</p>
+              <p id="cabDriverDisplay" class="text-xs font-bold text-white">Driver: —</p>
             </div>
-            <a href="cab_tracking.html"
-              class="ml-auto px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/40 border border-yellow-500/40 text-yellow-400 text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-1.5">
-              <span class="material-symbols-outlined" style="font-size:16px;">directions_car</span>
-              Track Cab
-            </a>
           </div>
-          <div
-            class="bg-white dark:bg-background-dark px-6 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-            <span id="statusDot" class="size-3 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span id="statusBadge" class="text-xs font-black uppercase tracking-widest">En Route</span>
-          </div>
+          <a href="cab_tracking.html"
+            class="px-3 py-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 border border-yellow-500/40 text-yellow-400 text-[9px] font-black uppercase tracking-widest rounded-xl transition flex items-center gap-1">
+            <span class="material-symbols-outlined" style="font-size:14px;">directions_car</span>
+            Track Cab
+          </a>
         </div>
       </header>
 
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 h-full">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0">
 
         <!-- Map Area -->
-        <div
-          class="lg:col-span-3 bg-white dark:bg-background-dark rounded-[40px] border border-slate-200 dark:border-slate-800 p-2 shadow-xl relative min-h-[400px]">
-          <div id="map"></div>
+        <div class="lg:col-span-3 bg-white dark:bg-background-dark rounded-3xl border border-slate-200 dark:border-slate-800 p-1.5 shadow-xl relative overflow-hidden">
+          <div id="map" class="w-full h-full"></div>
 
           <!-- Floating Overlay -->
-          <div class="absolute bottom-10 left-10 z-[100] right-10 flex flex-wrap gap-4 pointer-events-none">
-            <div
-              class="bg-white/90 dark:bg-background-dark/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl flex items-center gap-8 pointer-events-auto">
+          <div class="absolute bottom-6 left-6 z-[100] right-6 flex flex-wrap gap-3 pointer-events-none">
+            <div class="bg-white/90 dark:bg-background-dark/90 backdrop-blur-md px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl flex items-center gap-6 pointer-events-auto">
               <div>
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Estimated Arrival</p>
-                <p class="text-3xl font-black text-primary"><span id="eta">15</span> <span class="text-sm">mins</span>
-                </p>
+                <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Arrival</p>
+                <p class="text-2xl font-black text-primary"><span id="eta">15</span> <span class="text-xs">mins</span></p>
               </div>
-              <div class="w-px h-12 bg-slate-200 dark:bg-slate-800"></div>
-              <div id="repairTimeContainer" class="hidden">
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Repair Time</p>
-                <p class="text-2xl font-black text-orange-400"><span id="repairTime">--</span></p>
+              <div class="w-px h-8 bg-slate-200 dark:bg-slate-800"></div>
+              <div id="repairTimeContainer" class="hidden text-center">
+                <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Repair</p>
+                <p class="text-xl font-black text-orange-400"><span id="repairTime">--</span></p>
               </div>
-              <div id="repairTimeSeparator" class="hidden w-px h-12 bg-slate-200 dark:bg-slate-800"></div>
-              <div id="repairDaysFloatContainer" class="hidden">
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">📅 Repair Days</p>
-                <p class="text-2xl font-black text-blue-400"><span id="repairDaysFloat">--</span> <span class="text-sm">days</span></p>
+              <div id="repairTimeSeparator" class="hidden w-px h-8 bg-slate-200 dark:bg-slate-800"></div>
+              <div id="repairDaysFloatContainer" class="hidden text-center">
+                <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">📅 Repair Days</p>
+                <p class="text-xl font-black text-blue-400"><span id="repairDaysFloat">--</span></p>
               </div>
-              <div id="repairDaysFloatSep" class="hidden w-px h-12 bg-slate-200 dark:bg-slate-800"></div>
+              <div id="repairDaysFloatSep" class="hidden w-px h-8 bg-slate-200 dark:bg-slate-800"></div>
               <div>
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Distance</p>
-                <p class="text-3xl font-black text-slate-900 dark:text-white"><span id="distanceCount">3.2</span> <span
-                    class="text-sm">km</span></p>
+                <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Distance</p>
+                <p class="text-2xl font-black text-slate-900 dark:text-white"><span id="distanceCount">3.2</span> <span class="text-xs">km</span></p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Mechanic Panel -->
-        <div class="lg:col-span-1 space-y-6 overflow-y-auto pb-20 pr-2 style-scrollbar">
-          <div
-            class="bg-white dark:bg-background-dark p-8 rounded-[40px] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center text-center">
-            <div id="mechPhoto"
-              class="size-24 rounded-3xl bg-primary/10 text-primary flex items-center justify-center font-black overflow-hidden mb-6 border-4 border-primary/20">
-              <span class="material-symbols-outlined text-5xl">person</span>
+        <!-- Sidebar Panel -->
+        <div class="lg:col-span-1 flex flex-col gap-4 overflow-y-auto pr-1 style-scrollbar">
+          <!-- Mechanic Profile -->
+          <div class="bg-white dark:bg-background-dark p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center text-center">
+            <div id="mechPhoto" class="size-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black overflow-hidden mb-4 border-2 border-primary/20">
+              <span class="material-symbols-outlined text-3xl">person</span>
             </div>
-            <h3 id="mechanicName" class="text-2xl font-black mb-2">Professional</h3>
-            <p class="text-sm font-bold text-primary uppercase tracking-widest mb-6">Verified Mechanic</p>
-
-            <div class="w-full space-y-3">
-              <a id="phoneLink" href="#" onclick="handleCallMechanic(event, this)"
-                class="w-full flex h-14 items-center justify-center gap-3 rounded-2xl bg-emerald-500 text-white font-black shadow-lg shadow-emerald-500/20 hover:scale-105 transition">
-                <span class="material-symbols-outlined">call</span>
-                <span id="callButtonText">Call Mechanic</span>
-              </a>
-            </div>
+            <h3 id="mechanicName" class="text-lg font-black mb-1">Professional</h3>
+            <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-4">Verified Mechanic</p>
+            <a id="phoneLink" href="#" onclick="handleCallMechanic(event, this)"
+              class="w-full flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 text-white text-xs font-black shadow-lg shadow-emerald-500/20 hover:scale-105 transition">
+              <span class="material-symbols-outlined text-lg">call</span>
+              <span id="callButtonText">Call Mechanic</span>
+            </a>
           </div>
 
-          <div class="bg-primary p-8 rounded-[40px] text-white">
-            <h4 class="font-black text-lg mb-2">Assistance Note</h4>
-            <p class="text-xs font-bold leading-relaxed opacity-80">Our professional is moving swiftly through traffic.
-              Please ensure your vehicle is in a safe location if possible.</p>
+          <!-- Assistance Note -->
+          <div class="bg-primary p-4 rounded-2xl text-white shadow-lg shadow-primary/10">
+            <h4 class="font-black text-xs mb-1 uppercase tracking-wider">Assistance Note</h4>
+            <p class="text-[10px] font-bold leading-tight opacity-90">Mechanic is moving swiftly. Ensure your vehicle is safe.</p>
           </div>
 
           <!-- Repair Days Card -->
-          <div id="repairDaysCard" class="hidden bg-blue-500/10 border border-blue-500/30 p-6 rounded-[28px]">
-            <p class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">📅 Estimated Repair Days</p>
-            <p class="text-3xl font-black text-white"><span id="repairDaysDisplay">--</span> <span class="text-sm text-blue-400">day(s)</span></p>
-            <p class="text-xs text-slate-400 mt-2 mb-1">Your vehicle will be ready in approximately this many days.</p>
+          <div id="repairDaysCard" class="hidden bg-blue-500/10 border border-blue-500/30 p-4 rounded-2xl">
+            <p class="text-[9px] font-black uppercase tracking-widest text-blue-400 mb-1">📅 Estimated Days</p>
+            <p class="text-2xl font-black text-white"><span id="repairDaysDisplay">--</span> <span class="text-xs text-blue-400">day(s)</span></p>
           </div>
 
-
-
           <!-- Action Buttons -->
-          <div class="space-y-3">
+          <div class="space-y-2 mt-auto">
             <button onclick="openFraudModal()"
-              class="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-red-500/30 bg-red-500/8 text-red-400 hover:bg-red-500/20 font-bold text-sm transition">
-              <span class="material-symbols-outlined" style="font-size:18px;">report</span>
-              🚨 Report Fraud / Issue
+              class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-500/30 bg-red-500/8 text-red-400 hover:bg-red-500/20 font-bold text-[11px] transition">
+              <span class="material-symbols-outlined" style="font-size:16px;">report</span>
+              Report Fraud
             </button>
             <button onclick="cancelServiceCompletely()"
-              class="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-red-700/40 bg-red-900/20 text-red-500 hover:bg-red-700/30 font-bold text-sm transition">
-              <span class="material-symbols-outlined" style="font-size:18px;">cancel</span>
-              ✖ Cancel This Service
+              class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-700/40 bg-red-900/10 text-red-600 hover:bg-red-700/20 font-bold text-[11px] transition">
+              <span class="material-symbols-outlined" style="font-size:16px;">cancel</span>
+              Cancel Service
             </button>
           </div>
         </div>
+
+      </div>       </div>
 
       </div>
 
