@@ -103,6 +103,56 @@ app.get('/', (req, res) => {
 
 app.get('/api/mechanics/nearest', serviceController.findNearestMechanics);
 
+// ⚠️ TEMPORARY MOJIBAKE CLEANUP ROUTE
+app.get('/api/admin/system/clean-mojibake', async (req, res) => {
+  try {
+    const replacements = [
+      { from: /ðŸ”’/g, to: '🔐' }, { from: /ðŸ””/g, to: '🔔' },
+      { from: /ðŸš—/g, to: '🚗' }, { from: /ðŸ”§/g, to: '🔧' },
+      { from: /ðŸš¨/g, to: '🚨' }, { from: /Â₹/g, to: '₹' },
+      { from: /âœ…/g, to: '✅' }, { from: /ðŸ“±/g, to: '📱' },
+      { from: /ðŸ“/g, to: '📍' }, { from: /ðŸ’³/g, to: '💳' },
+      { from: /ðŸš•/g, to: '🚕' }, { from: /ðŸ›/g, to: '🛠️' },
+      { from: /â•/g, to: '—' }, { from: /â€¢/g, to: '•' },
+      { from: /Aeuro\$/g, to: '₹' }
+    ];
+
+    let results = [];
+    const Mechanic = require('./models/Mechanic');
+    const ServiceRequest = require('./models/ServiceRequest');
+
+    // 1. Clean Mechanics
+    const mechanics = await Mechanic.findAll();
+    for (const m of mechanics) {
+      let changed = false;
+      let name = m.name, district = m.district, jobTitle = m.jobTitle;
+      replacements.forEach(r => {
+        if (name && r.from.test(name)) { name = name.replace(r.from, r.to); changed = true; }
+        if (district && r.from.test(district)) { district = district.replace(r.from, r.to); changed = true; }
+        if (jobTitle && r.from.test(jobTitle)) { jobTitle = jobTitle.replace(r.from, r.to); changed = true; }
+      });
+      if (changed) { await m.update({ name, district, jobTitle }); results.push(`Mechanic ${m.phone} cleaned`); }
+    }
+
+    // 2. Clean ServiceRequests
+    const requests = await ServiceRequest.findAll();
+    for (const r of requests) {
+      let changed = false;
+      let issueType = r.issueType, district = r.district;
+      replacements.forEach(rep => {
+        if (issueType && rep.from.test(issueType)) { issueType = issueType.replace(rep.from, rep.to); changed = true; }
+        if (district && rep.from.test(district)) { district = district.replace(rep.from, rep.to); changed = true; }
+      });
+      if (changed) { await r.update({ issueType, district }); results.push(`Request ${r.id} cleaned`); }
+    }
+
+    res.json({ message: "Mojibake cleanup complete", results });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // Cabs API
 app.get('/api/cabs', async (req, res) => {
   try {
