@@ -132,9 +132,17 @@
 
   </div>
 
-  <script src="http://localhost:5001/socket.io/socket.io.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
-    const socket = io("http://localhost:5001");
+    // Dynamic Backend URL Detection
+    const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5001'
+      : 'https://resq-backend-production.up.railway.app'; // <--- UPDATE THIS after Railway deployment
+
+    const socket = io(BACKEND_URL, {
+      transports: ['websocket', 'polling'],
+      withCredentials: true
+    });
     const phone = sessionStorage.getItem("otp_phone") || localStorage.getItem("phone");
     const role = sessionStorage.getItem("otp_role") || localStorage.getItem("role");
 
