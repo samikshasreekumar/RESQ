@@ -38,13 +38,19 @@ const io = new Server(server, {
 // Make io accessible in controllers
 app.set('io', io);
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // Middleware
 app.use(cors({
   origin: ["http://localhost:3000", "http://localhost:5001", "http://localhost:5500", "http://127.0.0.1:5500", "https://resq-delta-sable.vercel.app"],
   credentials: true
 }));
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir));
 
 // Associations
 User.hasMany(Vehicle, { foreignKey: 'userPhone' });
